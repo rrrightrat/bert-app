@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">BERT</string>
+    <string name="app_full_title">Bedrock Edition Redstone Toolkit</string>
+    <string name="tab_comparator">Comparator</string>
+    <string name="tab_timing">Timings &amp; Clocks</string>
+    <string name="tab_sorter">Item Sorters</string>
+    <string name="tab_ballistics">Ballistics &amp; TNT</string>
+    <string name="tab_mechanics">MCBE Mechanics</string>
+    <string name="tab_logic">Binary &amp; Logic</string>
+    <string name="tab_blueprints">Saved Presets</string>
+</resources>

@@ -1,0 +1,6 @@
+{
+  "name": "BERT",
+  "description": "Bedrock Edition Redstone Toolkit - advanced calculations, comparator math, tick timings, and contraption physics for Minecraft Bedrock redstone engineers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
