@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 
 enum class AppScreen(val title: String, val iconLabel: String) {
     HOME("Home", "HOME"),
+    COMPONENTS("Component DB", "DB"),
     COMPARATOR("Comparator", "CMP"),
     TIMING("Timings", "CLK"),
     SORTER("Sorters", "SRT"),

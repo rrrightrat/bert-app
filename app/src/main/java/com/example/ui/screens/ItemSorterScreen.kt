@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,15 +41,16 @@ import com.example.ui.components.NumericInputField
 import com.example.ui.components.RedstoneSignalBar
 import com.example.ui.components.SectionCard
 import com.example.ui.theme.AccentAmber
-import com.example.ui.theme.NetflixCardBorder
-import com.example.ui.theme.NetflixDarkSurface
-import com.example.ui.theme.NetflixDarkSurfaceVariant
-import com.example.ui.theme.NetflixGray
-import com.example.ui.theme.NetflixMuted
-import com.example.ui.theme.NetflixOffWhite
-import com.example.ui.theme.NetflixRed
-import com.example.ui.theme.NetflixRedBright
-import com.example.ui.theme.NetflixWhite
+import com.example.ui.theme.DarkCardBorder
+import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceVariant
+import com.example.ui.theme.GrayText
+import com.example.ui.theme.MutedText
+import com.example.ui.theme.OffWhite
+import com.example.ui.theme.PurpleBright
+import com.example.ui.theme.PurpleContainer
+import com.example.ui.theme.PurplePrimary
+import com.example.ui.theme.White
 
 @Composable
 fun ItemSorterScreen(
@@ -61,26 +63,26 @@ fun ItemSorterScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         TabRow(
             selectedTabIndex = selectedTab,
-            containerColor = NetflixDarkSurface,
-            contentColor = NetflixRed,
+            containerColor = DarkSurface,
+            contentColor = PurplePrimary,
             indicator = { tabPositions ->
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                    color = NetflixRed
+                    color = PurplePrimary
                 )
             },
             modifier = Modifier.testTag("sorter_tab_row")
         ) {
-            Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("FILTER LAYOUT", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("THROUGHPUT", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("NON-STACKABLE", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
+            Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("FILTER LAYOUT", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) })
+            Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("THROUGHPUT", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) })
+            Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("NON-STACKABLE", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) })
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         when (selectedTab) {
             0 -> FilterLayoutSection(onSaveBlueprint)
@@ -94,7 +96,7 @@ fun ItemSorterScreen(
 private fun FilterLayoutSection(
     onSaveBlueprint: (title: String, category: String, desc: String, config: String) -> Unit
 ) {
-    var filterType by remember { mutableIntStateOf(0) } // 0 = Standard 41, 1 = Budget 18, 2 = 16-Stack
+    var filterType by remember { mutableIntStateOf(0) }
     var simulatedIncomingItems by remember { mutableIntStateOf(0) }
 
     val (targetItems, blockerItems, totalResting, activationItem, overflowItem, stackSize) = when (filterType) {
@@ -128,49 +130,50 @@ private fun FilterLayoutSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             listOf(
                 "41-ITEM STANDARD" to 0,
                 "18-ITEM BUDGET" to 1,
                 "16-STACK (PEARLS)" to 2
             ).forEach { (label, type) ->
+                val isSelected = filterType == type
                 Surface(
                     onClick = { filterType = type; simulatedIncomingItems = 0 },
-                    shape = RoundedCornerShape(4.dp),
-                    color = if (filterType == type) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (filterType == type) NetflixRed else NetflixCardBorder)
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) PurpleContainer else DarkSurfaceVariant,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) PurplePrimary else DarkCardBorder)
                 ) {
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (filterType == type) FontWeight.Bold else FontWeight.Normal,
-                        color = if (filterType == type) NetflixRedBright else NetflixOffWhite,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isSelected) PurpleBright else OffWhite,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         RedstoneSignalBar(currentSignal = currentSignal)
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         val (stateText, stateColor) = when {
-            currentSignal == 2 -> "RESTING STATE (Locked — Waiting for items)" to NetflixOffWhite
-            currentSignal == 3 -> "ACTIVE STATE (Unlocked — Feeding items into storage)" to NetflixRedBright
-            currentSignal >= 4 -> "OVERFLOW DANGER! (Signal bleeds into adjacent hopper slices)" to AccentAmber
-            else -> "BELOW THRESHOLD" to NetflixMuted
+            currentSignal == 2 -> "RESTING STATE (Locked — Waiting for items)" to OffWhite
+            currentSignal == 3 -> "ACTIVE STATE (Unlocked — Feeding items into storage)" to PurpleBright
+            currentSignal >= 4 -> "OVERFLOW DANGER! (Signal bleeds into adjacent slices)" to AccentAmber
+            else -> "BELOW THRESHOLD" to MutedText
         }
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text("STATUS: $stateText", fontWeight = FontWeight.Bold, color = stateColor)
                 SorterRow("Slot 1 (Target Filter Item):", "$targetItems items")
                 SorterRow("Slots 2, 3, 4, 5 (Renamed Blockers):", "1 item in each slot (4 total)")
@@ -181,7 +184,7 @@ private fun FilterLayoutSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         NumericInputField(
             value = simulatedIncomingItems,
@@ -194,7 +197,7 @@ private fun FilterLayoutSection(
             helperText = "Type or test how many items can back up before signal reaches SS 4."
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         BedrockTipCard(
             title = "Bedrock Overflow Rule",
@@ -203,7 +206,7 @@ private fun FilterLayoutSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(14.dp))
+    Spacer(modifier = Modifier.height(18.dp))
 
     Button(
         onClick = {
@@ -214,13 +217,13 @@ private fun FilterLayoutSection(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NetflixRed),
-        shape = RoundedCornerShape(6.dp)
+            .height(54.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = NetflixWhite)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Save Filter Layout to Blueprints", color = NetflixWhite, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = Color.Black)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text("Save Filter Layout to Blueprints", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 15.sp)
     }
 }
 
@@ -237,8 +240,8 @@ private data class FilterSpecs(
 private fun HopperThroughputSection(
     onSaveBlueprint: (title: String, category: String, desc: String, config: String) -> Unit
 ) {
-    var customTotalItems by remember { mutableIntStateOf(1728) } // default Shulker box
-    var hopperConfiguration by remember { mutableIntStateOf(0) } // 0 = Single, 1 = Double, 2 = Minecart
+    var customTotalItems by remember { mutableIntStateOf(1728) }
+    var hopperConfiguration by remember { mutableIntStateOf(0) }
 
     val (hopperName, itemsPerSecond) = when (hopperConfiguration) {
         0 -> "Single Hopper (4 RT / 8 GT per item)" to 2.5
@@ -265,46 +268,47 @@ private fun HopperThroughputSection(
             helperText = "1,728 items = 1 Shulker Box / Single Chest. 3,456 items = Double Chest."
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
-        Text("HOPPER FEED MECHANISM", style = MaterialTheme.typography.labelSmall, color = NetflixGray)
-        Spacer(modifier = Modifier.height(6.dp))
+        Text("HOPPER FEED MECHANISM", style = MaterialTheme.typography.titleSmall, color = White)
+        Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             listOf(
                 "1x HOPPER (2.5/s)" to 0,
                 "2x HOPPERS (5.0/s)" to 1,
                 "MINECART HOPPER (20/s)" to 2
             ).forEach { (label, config) ->
+                val isSelected = hopperConfiguration == config
                 Surface(
                     onClick = { hopperConfiguration = config },
-                    shape = RoundedCornerShape(4.dp),
-                    color = if (hopperConfiguration == config) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (hopperConfiguration == config) NetflixRed else NetflixCardBorder)
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) PurpleContainer else DarkSurfaceVariant,
+                    border = androidx.compose.foundation.BorderStroke(1.dp, if (isSelected) PurplePrimary else DarkCardBorder)
                 ) {
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (hopperConfiguration == config) FontWeight.Bold else FontWeight.Normal,
-                        color = if (hopperConfiguration == config) NetflixRedBright else NetflixOffWhite,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isSelected) PurpleBright else OffWhite,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 SorterRow("Total Items to Transfer:", "$customTotalItems items (${customTotalItems / 64} stacks + ${customTotalItems % 64})")
                 SorterRow("Transfer Rate:", "$itemsPerSecond items/sec (${(itemsPerSecond * 60).toInt()} items/min)")
                 SorterRow("Total Duration in Seconds:", "${transferSeconds.toInt()} seconds")
@@ -312,7 +316,7 @@ private fun HopperThroughputSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         BedrockTipCard(
             title = "Minecart Hopper Suction",
@@ -320,7 +324,7 @@ private fun HopperThroughputSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(14.dp))
+    Spacer(modifier = Modifier.height(18.dp))
 
     Button(
         onClick = {
@@ -331,13 +335,13 @@ private fun HopperThroughputSection(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NetflixRed),
-        shape = RoundedCornerShape(6.dp)
+            .height(54.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = NetflixWhite)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Save Throughput Specs to Blueprints", color = NetflixWhite, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = Color.Black)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text("Save Throughput Specs to Blueprints", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 15.sp)
     }
 }
 
@@ -349,32 +353,33 @@ private fun NonStackableSorterSection(
         title = "Bedrock Non-Stackable Item Sorting",
         subtitle = "Swords, armor, potions, bows, and enchanted books"
     ) {
-        Text("Signal Output for Non-Stackable in Hopper:", style = MaterialTheme.typography.labelSmall, color = NetflixGray)
-        Spacer(modifier = Modifier.height(6.dp))
+        Text("Signal Output for Non-Stackable in Hopper:", style = MaterialTheme.typography.labelSmall, color = GrayText)
+        Spacer(modifier = Modifier.height(10.dp))
         RedstoneSignalBar(currentSignal = 3)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = "When a single non-stackable item enters an empty 5-slot hopper, it fills 64/320 weight (20%), instantly producing Signal Strength 3 (compared to SS 1 for a single 64-stack item).",
-            style = MaterialTheme.typography.bodySmall,
-            color = NetflixOffWhite
+            style = MaterialTheme.typography.bodyMedium,
+            color = OffWhite,
+            lineHeight = 22.sp
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("BEDROCK METHODS FOR NON-STACKABLES", style = MaterialTheme.typography.labelSmall, color = NetflixRedBright)
-                Text("1. Allay Sorting: Give an Allay the target item. Allays pick up duplicate items and deliver to a Note Block.", style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
-                Text("2. Potion Brewing Sorter: Fill a brewing stand with water bottles. Potions with effects filter through.", style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
-                Text("3. Shulker Box Separation: Dispensers place Shulker Boxes; items pass into hoppers while shulkers are broken by a piston.", style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("BEDROCK METHODS FOR NON-STACKABLES", style = MaterialTheme.typography.labelSmall, color = PurpleBright)
+                Text("1. Allay Sorting: Give an Allay the target item. Allays pick up duplicate items and deliver to a Note Block.", style = MaterialTheme.typography.bodySmall, color = OffWhite)
+                Text("2. Potion Brewing Sorter: Fill a brewing stand with water bottles. Potions with effects filter through.", style = MaterialTheme.typography.bodySmall, color = OffWhite)
+                Text("3. Shulker Box Separation: Dispensers place Shulker Boxes; items pass into hoppers while shulkers are broken by a piston.", style = MaterialTheme.typography.bodySmall, color = OffWhite)
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         BedrockTipCard(
             title = "Dropper Elevator Tick Warning",
@@ -389,7 +394,7 @@ private fun SorterRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = NetflixGray)
-        Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = NetflixOffWhite)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = GrayText)
+        Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = OffWhite)
     }
 }

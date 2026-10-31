@@ -13,48 +13,48 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = NetflixRed,
-    onPrimary = Color.White,
-    primaryContainer = NetflixDarkRed,
-    onPrimaryContainer = Color(0xFFFFDAD6),
-    secondary = NetflixOffWhite,
+    primary = PurplePrimary,
+    onPrimary = Color.Black,
+    primaryContainer = PurpleContainer,
+    onPrimaryContainer = PurpleGlow,
+    secondary = White,
     onSecondary = Color.Black,
-    secondaryContainer = NetflixDarkSurfaceVariant,
-    onSecondaryContainer = NetflixWhite,
-    tertiary = AccentAmber,
+    secondaryContainer = DarkSurfaceVariant,
+    onSecondaryContainer = OffWhite,
+    tertiary = PurpleBright,
     onTertiary = Color.Black,
-    background = NetflixBlack,
-    onBackground = NetflixWhite,
-    surface = NetflixDarkSurface,
-    onSurface = NetflixWhite,
-    surfaceVariant = NetflixDarkSurfaceVariant,
-    onSurfaceVariant = NetflixGray,
-    outline = NetflixCardBorder
+    background = DarkBackground,
+    onBackground = White,
+    surface = DarkSurface,
+    onSurface = White,
+    surfaceVariant = DarkSurfaceVariant,
+    onSurfaceVariant = GrayText,
+    outline = DarkCardBorder
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = NetflixRed,
+    primary = PurpleDark,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFFFEBEE),
-    onPrimaryContainer = NetflixDarkRed,
-    secondary = Color(0xFF1E293B),
+    primaryContainer = Color(0xFFF3E8FF),
+    onPrimaryContainer = Color(0xFF3B0764),
+    secondary = Color(0xFF18181B),
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFF1F5F9),
-    onSecondaryContainer = Color(0xFF0F172A),
-    tertiary = AccentAmber,
+    secondaryContainer = Color(0xFFF4F4F5),
+    onSecondaryContainer = Color(0xFF18181B),
+    tertiary = PurplePrimary,
     onTertiary = Color.White,
     background = Color(0xFFFAFAFA),
-    onBackground = Color(0xFF111111),
+    onBackground = Color(0xFF09090B),
     surface = Color.White,
-    onSurface = Color(0xFF111111),
-    surfaceVariant = Color(0xFFF3F4F6),
-    onSurfaceVariant = Color(0xFF4B5563),
-    outline = Color(0xFFE5E7EB)
+    onSurface = Color(0xFF09090B),
+    surfaceVariant = Color(0xFFF4F4F5),
+    onSurfaceVariant = Color(0xFF52525B),
+    outline = Color(0xFFE4E4E7)
 )
 
 @Composable
 fun BERTTheme(
-    darkTheme: Boolean = true, // Default to Netflix Dark
+    darkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme

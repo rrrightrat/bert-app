@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -41,15 +42,16 @@ import com.example.data.model.RedstoneMath
 import com.example.ui.components.BedrockTipCard
 import com.example.ui.components.NumericInputField
 import com.example.ui.components.SectionCard
-import com.example.ui.theme.NetflixCardBorder
-import com.example.ui.theme.NetflixDarkSurface
-import com.example.ui.theme.NetflixDarkSurfaceVariant
-import com.example.ui.theme.NetflixGray
-import com.example.ui.theme.NetflixMuted
-import com.example.ui.theme.NetflixOffWhite
-import com.example.ui.theme.NetflixRed
-import com.example.ui.theme.NetflixRedBright
-import com.example.ui.theme.NetflixWhite
+import com.example.ui.theme.DarkCardBorder
+import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceVariant
+import com.example.ui.theme.GrayText
+import com.example.ui.theme.MutedText
+import com.example.ui.theme.OffWhite
+import com.example.ui.theme.PurpleBright
+import com.example.ui.theme.PurpleContainer
+import com.example.ui.theme.PurplePrimary
+import com.example.ui.theme.White
 
 @Composable
 fun TimingScreen(
@@ -62,27 +64,27 @@ fun TimingScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         TabRow(
             selectedTabIndex = selectedTab,
-            containerColor = NetflixDarkSurface,
-            contentColor = NetflixRed,
+            containerColor = DarkSurface,
+            contentColor = PurplePrimary,
             indicator = { tabPositions ->
                 TabRowDefaults.SecondaryIndicator(
                     modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                    color = NetflixRed
+                    color = PurplePrimary
                 )
             },
             modifier = Modifier.testTag("timing_tab_row")
         ) {
-            Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("ETHO CLOCK", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("REPEATERS", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("TICK CONV", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 3, onClick = { selectedTab = 3 }, text = { Text("EXTENDER", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
+            Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("ETHO CLOCK", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) })
+            Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("REPEATERS", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) })
+            Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("TICK CONV", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) })
+            Tab(selected = selectedTab == 3, onClick = { selectedTab = 3 }, text = { Text("EXTENDER", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 12.dp)) })
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         when (selectedTab) {
             0 -> EthoClockSection(onSaveBlueprint)
@@ -114,44 +116,44 @@ private fun EthoClockSection(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Surface(
                 onClick = { isInputModeItems = true },
-                shape = RoundedCornerShape(4.dp),
-                color = if (isInputModeItems) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                border = androidx.compose.foundation.BorderStroke(1.dp, if (isInputModeItems) NetflixRed else NetflixCardBorder),
+                shape = RoundedCornerShape(8.dp),
+                color = if (isInputModeItems) PurpleContainer else DarkSurfaceVariant,
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (isInputModeItems) PurplePrimary else DarkCardBorder),
                 modifier = Modifier.weight(1f)
             ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 8.dp)) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 10.dp)) {
                     Text(
                         "BY ITEM COUNT",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (isInputModeItems) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isInputModeItems) NetflixRedBright else NetflixOffWhite
+                        fontWeight = if (isInputModeItems) FontWeight.Bold else FontWeight.Medium,
+                        color = if (isInputModeItems) PurpleBright else OffWhite
                     )
                 }
             }
 
             Surface(
                 onClick = { isInputModeItems = false },
-                shape = RoundedCornerShape(4.dp),
-                color = if (!isInputModeItems) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                border = androidx.compose.foundation.BorderStroke(1.dp, if (!isInputModeItems) NetflixRed else NetflixCardBorder),
+                shape = RoundedCornerShape(8.dp),
+                color = if (!isInputModeItems) PurpleContainer else DarkSurfaceVariant,
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (!isInputModeItems) PurplePrimary else DarkCardBorder),
                 modifier = Modifier.weight(1f)
             ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 8.dp)) {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(vertical = 10.dp)) {
                     Text(
                         "BY TARGET SECONDS",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (!isInputModeItems) FontWeight.Bold else FontWeight.Normal,
-                        color = if (!isInputModeItems) NetflixRedBright else NetflixOffWhite
+                        fontWeight = if (!isInputModeItems) FontWeight.Bold else FontWeight.Medium,
+                        color = if (!isInputModeItems) PurpleBright else OffWhite
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         if (isInputModeItems) {
             NumericInputField(
@@ -177,14 +179,14 @@ private fun EthoClockSection(
             )
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 TimingRow("Item Count Required:", "${clockResult.items} items (${clockResult.items / 64} stacks + ${clockResult.items % 64})")
                 TimingRow("Full Cycle Period:", "${String.format("%.2f", clockResult.fullCycleSeconds)}s (${clockResult.fullCycleRedstoneTicks} RT / ${clockResult.fullCycleGameTicks} GT)")
                 TimingRow("One-Way Transfer Time:", "${String.format("%.2f", clockResult.oneWaySeconds)}s (${clockResult.oneWayRedstoneTicks} RT / ${clockResult.oneWayGameTicks} GT)")
@@ -192,7 +194,7 @@ private fun EthoClockSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         BedrockTipCard(
             title = "Bedrock Chunk-Border Rule",
@@ -200,7 +202,7 @@ private fun EthoClockSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(14.dp))
+    Spacer(modifier = Modifier.height(18.dp))
 
     Button(
         onClick = {
@@ -211,13 +213,13 @@ private fun EthoClockSection(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NetflixRed),
-        shape = RoundedCornerShape(6.dp)
+            .height(54.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = NetflixWhite)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Save Clock Setup to Blueprints", color = NetflixWhite, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = Color.Black)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text("Save Clock Setup to Blueprints", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 15.sp)
     }
 }
 
@@ -245,15 +247,15 @@ private fun RepeaterChainSection(
             helperText = "Type any target delay in ticks. E.g. 2 RT for sticky pistons, 40 RT for TNT fuse."
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("OPTIMAL REPEATER COMBINATION", style = MaterialTheme.typography.labelSmall, color = NetflixRedBright)
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("OPTIMAL REPEATER COMBINATION", style = MaterialTheme.typography.labelSmall, color = PurpleBright)
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -272,7 +274,7 @@ private fun RepeaterChainSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         BedrockTipCard(
             title = "Bedrock Repeater Routing",
@@ -280,7 +282,7 @@ private fun RepeaterChainSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(14.dp))
+    Spacer(modifier = Modifier.height(18.dp))
 
     Button(
         onClick = {
@@ -291,13 +293,13 @@ private fun RepeaterChainSection(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NetflixRed),
-        shape = RoundedCornerShape(6.dp)
+            .height(54.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = NetflixWhite)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Save Repeater Chain to Blueprints", color = NetflixWhite, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = Color.Black)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text("Save Repeater Chain to Blueprints", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 15.sp)
     }
 }
 
@@ -322,14 +324,14 @@ private fun TickConverterSection() {
             helperText = "Type seconds to convert instantly into Minecraft ticks."
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 TimingRow("Game Ticks (GT):", "$gt ticks (50ms base engine tick)")
                 TimingRow("Redstone Ticks (RT):", "$rt ticks (100ms redstone tick)")
                 TimingRow("Milliseconds (ms):", "$ms ms")
@@ -337,7 +339,7 @@ private fun TickConverterSection() {
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         BedrockTipCard(
             title = "Torch Burnout Warning",
@@ -361,36 +363,36 @@ private fun PulseExtenderSection(
         subtitle = "Two comparators in decay loop",
         trailingTag = "${String.format("%.1f", faderResult.totalSeconds)}s"
     ) {
-        NumericInputField(
-            value = initialSignal,
-            onValueChange = { initialSignal = it },
-            label = "Initial Signal Strength",
-            min = 1,
-            max = 15,
-            unit = "SS 1-15",
-            quickPresets = listOf(5, 10, 15)
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            NumericInputField(
+                value = initialSignal,
+                onValueChange = { initialSignal = it },
+                label = "Initial Signal Strength",
+                min = 1,
+                max = 15,
+                unit = "SS 1-15",
+                quickPresets = listOf(5, 10, 15)
+            )
 
-        Spacer(modifier = Modifier.height(14.dp))
+            NumericInputField(
+                value = wireLength,
+                onValueChange = { wireLength = it },
+                label = "Wire Length in Loop",
+                min = 1,
+                max = 5,
+                unit = "Blocks",
+                quickPresets = listOf(1, 2, 3)
+            )
+        }
 
-        NumericInputField(
-            value = wireLength,
-            onValueChange = { wireLength = it },
-            label = "Wire Length in Loop",
-            min = 1,
-            max = 5,
-            unit = "Blocks",
-            quickPresets = listOf(1, 2, 3)
-        )
-
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 TimingRow("Decay Iteration Steps:", "${faderResult.decaySteps} drops")
                 TimingRow("Total Pulse Duration:", "${String.format("%.2f", faderResult.totalSeconds)} seconds")
                 TimingRow("Total Redstone Ticks:", "${faderResult.totalRedstoneTicks} RT (${faderResult.totalRedstoneTicks * 2} GT)")
@@ -398,7 +400,7 @@ private fun PulseExtenderSection(
         }
     }
 
-    Spacer(modifier = Modifier.height(14.dp))
+    Spacer(modifier = Modifier.height(18.dp))
 
     Button(
         onClick = {
@@ -409,13 +411,13 @@ private fun PulseExtenderSection(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NetflixRed),
-        shape = RoundedCornerShape(6.dp)
+            .height(54.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = NetflixWhite)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Save Extender Setup to Blueprints", color = NetflixWhite, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = Color.Black)
+        Spacer(modifier = Modifier.width(10.dp))
+        Text("Save Extender Setup to Blueprints", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 15.sp)
     }
 }
 
@@ -425,19 +427,19 @@ private fun TimingRow(label: String, value: String) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = NetflixGray)
-        Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = NetflixOffWhite)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = GrayText)
+        Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = OffWhite)
     }
 }
 
 @Composable
 private fun RepeaterCountPill(label: String, count: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp), color = NetflixMuted)
+        Text(label, style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp), color = MutedText)
         Text(
             text = "$count",
             style = MaterialTheme.typography.titleLarge,
-            color = if (count > 0) NetflixRedBright else NetflixMuted.copy(alpha = 0.4f),
+            color = if (count > 0) PurpleBright else MutedText.copy(alpha = 0.4f),
             fontWeight = FontWeight.Bold
         )
     }

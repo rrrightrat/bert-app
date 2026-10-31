@@ -1,6 +1,7 @@
 package com.example.ui.screens
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -14,8 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -43,16 +42,16 @@ import com.example.data.model.BedrockKnowledgeBase
 import com.example.ui.components.NumericInputField
 import com.example.ui.components.RedstoneSignalBar
 import com.example.ui.components.SectionCard
-import com.example.ui.theme.AccentAmber
-import com.example.ui.theme.NetflixCardBorder
-import com.example.ui.theme.NetflixDarkSurface
-import com.example.ui.theme.NetflixDarkSurfaceVariant
-import com.example.ui.theme.NetflixGray
-import com.example.ui.theme.NetflixMuted
-import com.example.ui.theme.NetflixOffWhite
-import com.example.ui.theme.NetflixRed
-import com.example.ui.theme.NetflixRedBright
-import com.example.ui.theme.NetflixWhite
+import com.example.ui.theme.DarkCardBorder
+import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceVariant
+import com.example.ui.theme.GrayText
+import com.example.ui.theme.MutedText
+import com.example.ui.theme.OffWhite
+import com.example.ui.theme.PurpleBright
+import com.example.ui.theme.PurpleContainer
+import com.example.ui.theme.PurplePrimary
+import com.example.ui.theme.White
 
 @Composable
 fun LogicScreen() {
@@ -63,25 +62,53 @@ fun LogicScreen() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
-        TabRow(
-            selectedTabIndex = selectedTab,
-            containerColor = NetflixDarkSurface,
-            contentColor = NetflixRed,
-            indicator = { tabPositions ->
-                TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                    color = NetflixRed
-                )
-            },
-            modifier = Modifier.testTag("logic_tab_row")
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = DarkSurface,
+            border = BorderStroke(1.dp, DarkCardBorder)
         ) {
-            Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("BASE CONVERTER", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("LOGIC GATES", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = DarkSurface,
+                contentColor = PurpleBright,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                        color = PurplePrimary
+                    )
+                },
+                modifier = Modifier.testTag("logic_tab_row")
+            ) {
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = {
+                        Text(
+                            "BASE CONVERTER",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 0) PurpleBright else GrayText
+                        )
+                    }
+                )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = {
+                        Text(
+                            "LOGIC GATES",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 1) PurpleBright else GrayText
+                        )
+                    }
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         when (selectedTab) {
             0 -> BinaryConverterSection()
@@ -112,31 +139,35 @@ private fun BinaryConverterSection() {
             helperText = "Type any decimal value or toggle individual bits below."
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
-        Text("8-BIT BUS SWITCHES (CLICK BIT TO FLIP)", style = MaterialTheme.typography.labelSmall, color = NetflixGray)
-        Spacer(modifier = Modifier.height(6.dp))
+        Text("8-BIT BUS SWITCHES (CLICK BIT TO FLIP)", style = MaterialTheme.typography.labelSmall, color = GrayText)
+        Spacer(modifier = Modifier.height(10.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             for (bit in 7 downTo 0) {
                 val isBitSet = (byteValue and (1 shl bit)) != 0
                 val bitWeight = 1 shl bit
 
                 val bgColor by animateColorAsState(
-                    targetValue = if (isBitSet) NetflixRed else NetflixDarkSurfaceVariant,
+                    targetValue = if (isBitSet) PurplePrimary else DarkSurfaceVariant,
                     label = "bitBg"
                 )
 
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(50.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .height(58.dp)
+                        .clip(RoundedCornerShape(8.dp))
                         .background(bgColor)
-                        .border(1.dp, if (isBitSet) NetflixRedBright else NetflixCardBorder, RoundedCornerShape(4.dp))
+                        .border(
+                            1.dp,
+                            if (isBitSet) PurpleBright else DarkCardBorder,
+                            RoundedCornerShape(8.dp)
+                        )
                         .clickable {
                             byteValue = if (isBitSet) {
                                 byteValue and (1 shl bit).inv()
@@ -151,26 +182,27 @@ private fun BinaryConverterSection() {
                             text = if (isBitSet) "1" else "0",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = if (isBitSet) Color.White else NetflixMuted
+                            color = if (isBitSet) White else MutedText
                         )
                         Text(
                             text = "b$bit ($bitWeight)",
-                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 7.sp),
-                            color = if (isBitSet) Color.White.copy(alpha = 0.8f) else NetflixMuted.copy(alpha = 0.6f)
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
+                            color = if (isBitSet) White.copy(alpha = 0.85f) else MutedText.copy(alpha = 0.7f)
                         )
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
+            border = BorderStroke(1.dp, DarkCardBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 BaseRow("Decimal (Base 10):", "$byteValue")
                 BaseRow("Hexadecimal (Base 16):", "0x" + byteValue.toString(16).uppercase().padStart(2, '0'))
                 BaseRow("Binary (Base 2):", byteValue.toString(2).padStart(8, '0').chunked(4).joinToString(" "))
@@ -178,7 +210,7 @@ private fun BinaryConverterSection() {
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         RedstoneSignalBar(currentSignal = analogSignal)
     }
@@ -195,73 +227,84 @@ private fun LogicGatesSection() {
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             gates.forEachIndexed { index, item ->
+                val isSelected = selectedGateIndex == index
                 Surface(
                     onClick = { selectedGateIndex = index },
-                    shape = RoundedCornerShape(4.dp),
-                    color = if (selectedGateIndex == index) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (selectedGateIndex == index) NetflixRed else NetflixCardBorder)
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) PurplePrimary.copy(alpha = 0.2f) else DarkSurfaceVariant,
+                    border = BorderStroke(1.dp, if (isSelected) PurplePrimary else DarkCardBorder)
                 ) {
                     Text(
                         text = item.name.uppercase(),
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (selectedGateIndex == index) FontWeight.Bold else FontWeight.Normal,
-                        color = if (selectedGateIndex == index) NetflixRedBright else NetflixOffWhite,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) PurpleBright else OffWhite,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
+            border = BorderStroke(1.dp, DarkCardBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(gate.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = NetflixRedBright)
-                    Text(gate.expression, style = MaterialTheme.typography.labelMedium, color = NetflixOffWhite, fontWeight = FontWeight.Bold)
+                    Text(gate.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = PurpleBright)
+                    Text(gate.expression, style = MaterialTheme.typography.labelMedium, color = OffWhite, fontWeight = FontWeight.Bold)
                 }
 
-                Text(gate.description, style = MaterialTheme.typography.bodySmall, color = NetflixGray)
+                Text(gate.description, style = MaterialTheme.typography.bodyMedium, color = GrayText)
 
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("TRUTH TABLE", style = MaterialTheme.typography.labelSmall, color = NetflixRedBright)
-                gate.truthTable.forEach { (input, output) ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(input, style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
-                        Text(output, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = NetflixRedBright)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("TRUTH TABLE", style = MaterialTheme.typography.labelSmall, color = PurpleBright, fontWeight = FontWeight.Bold)
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = DarkSurface,
+                    border = BorderStroke(1.dp, DarkCardBorder),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        gate.truthTable.forEach { (input, output) ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(input, style = MaterialTheme.typography.bodySmall, color = OffWhite)
+                                Text(output, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = PurpleBright)
+                            }
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("BEDROCK CONSTRUCTION", style = MaterialTheme.typography.labelSmall, color = NetflixRedBright)
-                Text(gate.bedrockComponentList, style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("BEDROCK CONSTRUCTION", style = MaterialTheme.typography.labelSmall, color = PurpleBright, fontWeight = FontWeight.Bold)
+                Text(gate.bedrockComponentList, style = MaterialTheme.typography.bodySmall, color = OffWhite)
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Propagation Delay:", style = MaterialTheme.typography.bodySmall, color = NetflixGray)
-                    Text(gate.delayTicks, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = NetflixWhite)
+                    Text("Propagation Delay:", style = MaterialTheme.typography.bodySmall, color = GrayText)
+                    Text(gate.delayTicks, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = White)
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
-                Text("Typical In-Game Usage:", style = MaterialTheme.typography.labelSmall, color = NetflixGray)
-                Text(gate.commonUsage, style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
+                Spacer(modifier = Modifier.height(6.dp))
+                Text("Typical In-Game Usage:", style = MaterialTheme.typography.labelSmall, color = GrayText)
+                Text(gate.commonUsage, style = MaterialTheme.typography.bodySmall, color = OffWhite)
             }
         }
     }
@@ -271,9 +314,10 @@ private fun LogicGatesSection() {
 private fun BaseRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = NetflixGray)
-        Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = NetflixOffWhite)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = GrayText)
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = OffWhite)
     }
 }

@@ -27,9 +27,7 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -51,21 +49,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ui.theme.AccentAmber
-import com.example.ui.theme.AccentCyan
-import com.example.ui.theme.NetflixCardBorder
-import com.example.ui.theme.NetflixDarkSurface
-import com.example.ui.theme.NetflixDarkSurfaceVariant
-import com.example.ui.theme.NetflixGray
-import com.example.ui.theme.NetflixMuted
-import com.example.ui.theme.NetflixOffWhite
-import com.example.ui.theme.NetflixRed
-import com.example.ui.theme.NetflixRedBright
-import com.example.ui.theme.NetflixWhite
+import com.example.ui.theme.CozyLanternAmber
+import com.example.ui.theme.CozyTorchGlow
+import com.example.ui.theme.DarkCardBorder
+import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceVariant
+import com.example.ui.theme.GrayText
+import com.example.ui.theme.MutedText
+import com.example.ui.theme.OffWhite
+import com.example.ui.theme.PurpleBright
+import com.example.ui.theme.PurpleContainer
+import com.example.ui.theme.PurpleDark
+import com.example.ui.theme.PurpleGlow
+import com.example.ui.theme.PurplePrimary
 import com.example.ui.theme.SignalHigh
 import com.example.ui.theme.SignalLow
 import com.example.ui.theme.SignalMax
 import com.example.ui.theme.SignalMid
 import com.example.ui.theme.SignalOff
+import com.example.ui.theme.SignalUltra
+import com.example.ui.theme.White
 
 @Composable
 fun NumericInputField(
@@ -82,33 +85,47 @@ fun NumericInputField(
     val focusManager = LocalFocusManager.current
     var textState by remember(value) { mutableStateOf(value.toString()) }
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp)
+    ) {
+        // Spacious header row with clear separation
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = label.uppercase(),
-                style = MaterialTheme.typography.labelSmall,
-                color = NetflixGray,
-                letterSpacing = 1.sp
+                text = label,
+                style = MaterialTheme.typography.titleSmall,
+                color = White,
+                fontWeight = FontWeight.SemiBold
             )
             if (unit != null) {
-                Text(
-                    text = unit.uppercase(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = NetflixMuted
-                )
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = PurpleContainer.copy(alpha = 0.6f),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, PurplePrimary.copy(alpha = 0.4f))
+                ) {
+                    Text(
+                        text = unit.uppercase(),
+                        style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                        color = PurpleBright,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                    )
+                }
             }
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
+        // Spacious Input Row
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // Decrement Button
             Surface(
@@ -117,17 +134,22 @@ fun NumericInputField(
                     onValueChange(next)
                     textState = next.toString()
                 },
-                shape = RoundedCornerShape(6.dp),
-                color = NetflixDarkSurfaceVariant,
-                border = androidx.compose.foundation.BorderStroke(1.dp, NetflixCardBorder),
-                modifier = Modifier.size(46.dp)
+                shape = RoundedCornerShape(12.dp),
+                color = DarkSurfaceVariant,
+                border = androidx.compose.foundation.BorderStroke(1.dp, DarkCardBorder),
+                modifier = Modifier.size(54.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.Remove, contentDescription = "Decrease", tint = NetflixWhite)
+                    Icon(
+                        imageVector = Icons.Default.Remove,
+                        contentDescription = "Decrease",
+                        tint = White,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
 
-            // Keyboard direct input field
+            // Keyboard direct input field with generous height
             OutlinedTextField(
                 value = textState,
                 onValueChange = { input ->
@@ -155,20 +177,20 @@ fun NumericInputField(
                 singleLine = true,
                 textStyle = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
-                    color = NetflixWhite,
-                    letterSpacing = 0.5.sp
+                    color = White,
+                    fontSize = 18.sp
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = NetflixRed,
-                    unfocusedBorderColor = NetflixCardBorder,
-                    focusedContainerColor = NetflixDarkSurfaceVariant,
-                    unfocusedContainerColor = NetflixDarkSurfaceVariant,
-                    cursorColor = NetflixRed
+                    focusedBorderColor = PurplePrimary,
+                    unfocusedBorderColor = DarkCardBorder,
+                    focusedContainerColor = DarkSurfaceVariant,
+                    unfocusedContainerColor = DarkSurfaceVariant,
+                    cursorColor = PurplePrimary
                 ),
-                shape = RoundedCornerShape(6.dp),
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .weight(1f)
-                    .height(52.dp)
+                    .height(54.dp)
                     .testTag("numeric_input_${label.lowercase().replace(" ", "_")}")
             )
 
@@ -179,56 +201,63 @@ fun NumericInputField(
                     onValueChange(next)
                     textState = next.toString()
                 },
-                shape = RoundedCornerShape(6.dp),
-                color = NetflixDarkSurfaceVariant,
-                border = androidx.compose.foundation.BorderStroke(1.dp, NetflixCardBorder),
-                modifier = Modifier.size(46.dp)
+                shape = RoundedCornerShape(12.dp),
+                color = DarkSurfaceVariant,
+                border = androidx.compose.foundation.BorderStroke(1.dp, DarkCardBorder),
+                modifier = Modifier.size(54.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.Add, contentDescription = "Increase", tint = NetflixWhite)
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Increase",
+                        tint = White,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
         }
 
         if (helperText != null) {
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = helperText,
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = 11.sp),
-                color = NetflixMuted
+                style = MaterialTheme.typography.bodySmall.copy(fontSize = 12.sp),
+                color = GrayText
             )
         }
 
+        // Quick Preset Chips with spacious cozy layout
         if (quickPresets.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 quickPresets.forEach { preset ->
+                    val isSelected = value == preset
                     Surface(
                         onClick = {
                             val next = preset.coerceIn(min, max)
                             onValueChange(next)
                             textState = next.toString()
                         },
-                        shape = RoundedCornerShape(4.dp),
-                        color = if (value == preset) NetflixRed.copy(alpha = 0.15f) else NetflixDarkSurfaceVariant,
+                        shape = RoundedCornerShape(10.dp),
+                        color = if (isSelected) PurpleContainer else DarkSurfaceVariant,
                         border = androidx.compose.foundation.BorderStroke(
                             1.dp,
-                            if (value == preset) NetflixRed else NetflixCardBorder
+                            if (isSelected) PurplePrimary else DarkCardBorder
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
-                            modifier = Modifier.padding(vertical = 6.dp)
+                            modifier = Modifier.padding(vertical = 9.dp)
                         ) {
                             Text(
                                 text = preset.toString(),
                                 style = MaterialTheme.typography.labelSmall,
-                                fontWeight = if (value == preset) FontWeight.Bold else FontWeight.Normal,
-                                color = if (value == preset) NetflixRedBright else NetflixOffWhite
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                                color = if (isSelected) PurpleBright else OffWhite
                             )
                         }
                     }
@@ -255,46 +284,47 @@ fun RedstoneSignalBar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "SIGNAL LEVEL (0-15)",
+                text = "REDSTONE SIGNAL GAUGE",
                 style = MaterialTheme.typography.labelSmall,
-                color = NetflixGray,
+                color = GrayText,
                 letterSpacing = 1.sp
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
+                        .size(10.dp)
                         .clip(CircleShape)
-                        .background(if (currentSignal > 0) NetflixRed else NetflixMuted)
+                        .background(if (currentSignal > 0) CozyLanternAmber else MutedText)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "SS $currentSignal  |  $currentSignal BLOCKS",
+                    text = "SS $currentSignal / 15 (${currentSignal} BLOCKS)",
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = if (currentSignal > 0) NetflixWhite else NetflixMuted
+                    color = if (currentSignal > 0) White else MutedText
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
+        // 15 segment LED row with comfortable cozy height
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(28.dp)
-                .clip(RoundedCornerShape(4.dp))
-                .background(NetflixDarkSurfaceVariant)
-                .padding(3.dp),
-            horizontalArrangement = Arrangement.spacedBy(3.dp)
+                .height(36.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(DarkSurfaceVariant)
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             for (level in 1..15) {
                 val isActive = level <= currentSignal
                 val activeColor = when {
                     level == 15 -> SignalMax
-                    level >= 12 -> SignalHigh
-                    level >= 8 -> SignalMid
-                    level >= 4 -> NetflixRed
+                    level >= 12 -> SignalUltra
+                    level >= 9 -> SignalHigh
+                    level >= 5 -> SignalMid
                     else -> SignalLow
                 }
 
@@ -308,8 +338,8 @@ fun RedstoneSignalBar(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(22.dp)
-                        .clip(RoundedCornerShape(2.dp))
+                        .height(28.dp)
+                        .clip(RoundedCornerShape(4.dp))
                         .background(animatedColor)
                         .clickable(enabled = onSegmentClick != null) {
                             onSegmentClick?.invoke(level)
@@ -319,8 +349,8 @@ fun RedstoneSignalBar(
                     if (level == 1 || level == 5 || level == 10 || level == 15) {
                         Text(
                             text = level.toString(),
-                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
-                            color = if (isActive) Color.White else NetflixMuted.copy(alpha = 0.5f),
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
+                            color = if (isActive) Color.Black else MutedText.copy(alpha = 0.6f),
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -341,56 +371,65 @@ fun SectionCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 6.dp),
+            .padding(vertical = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = NetflixDarkSurface
+            containerColor = DarkSurface
         ),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(18.dp),
         border = CardDefaults.outlinedCardBorder().copy(
-            brush = androidx.compose.ui.graphics.SolidColor(NetflixCardBorder),
+            brush = androidx.compose.ui.graphics.SolidColor(DarkCardBorder),
             width = 1.dp
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(22.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = title.uppercase(),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = NetflixWhite,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 1.sp
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(7.dp)
+                                .clip(CircleShape)
+                                .background(PurpleBright.copy(alpha = 0.85f))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = White,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                     if (!subtitle.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.height(2.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.bodySmall,
-                            color = NetflixGray
+                            color = GrayText
                         )
                     }
                 }
                 if (!trailingTag.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.width(12.dp))
                     Surface(
-                        shape = RoundedCornerShape(4.dp),
-                        color = NetflixDarkSurfaceVariant,
-                        border = androidx.compose.foundation.BorderStroke(1.dp, NetflixRed.copy(alpha = 0.5f))
+                        shape = RoundedCornerShape(8.dp),
+                        color = PurpleContainer,
+                        border = androidx.compose.foundation.BorderStroke(1.dp, PurplePrimary.copy(alpha = 0.5f))
                     ) {
                         Text(
                             text = trailingTag,
                             style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
-                            color = NetflixRedBright,
+                            color = PurpleBright,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                         )
                     }
                 }
             }
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(18.dp))
             content()
         }
     }
@@ -403,19 +442,19 @@ fun BedrockTipCard(
     modifier: Modifier = Modifier,
     isWarning: Boolean = false
 ) {
-    val borderColor = if (isWarning) AccentAmber.copy(alpha = 0.5f) else NetflixCardBorder
-    val accentColor = if (isWarning) AccentAmber else NetflixRed
+    val borderColor = if (isWarning) AccentAmber.copy(alpha = 0.6f) else DarkCardBorder
+    val accentColor = if (isWarning) AccentAmber else PurpleBright
 
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = RoundedCornerShape(6.dp),
-        color = NetflixDarkSurfaceVariant,
+            .padding(vertical = 6.dp),
+        shape = RoundedCornerShape(14.dp),
+        color = DarkSurfaceVariant,
         border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
     ) {
         Row(
-            modifier = Modifier.padding(14.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.Top
         ) {
             Icon(
@@ -423,23 +462,23 @@ fun BedrockTipCard(
                 contentDescription = null,
                 tint = accentColor,
                 modifier = Modifier
-                    .size(18.dp)
+                    .size(20.dp)
                     .padding(top = 2.dp)
             )
-            Spacer(modifier = Modifier.width(10.dp))
+            Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = title.uppercase(),
-                    style = MaterialTheme.typography.labelMedium,
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
-                    color = accentColor,
-                    letterSpacing = 0.5.sp
+                    color = accentColor
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = NetflixOffWhite
+                    color = OffWhite,
+                    lineHeight = 20.sp
                 )
             }
         }

@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,14 +42,14 @@ import com.example.data.model.RedstoneMath
 import com.example.ui.components.BedrockTipCard
 import com.example.ui.components.NumericInputField
 import com.example.ui.components.SectionCard
-import com.example.ui.theme.NetflixCardBorder
-import com.example.ui.theme.NetflixDarkSurface
-import com.example.ui.theme.NetflixDarkSurfaceVariant
-import com.example.ui.theme.NetflixGray
-import com.example.ui.theme.NetflixOffWhite
-import com.example.ui.theme.NetflixRed
-import com.example.ui.theme.NetflixRedBright
-import com.example.ui.theme.NetflixWhite
+import com.example.ui.theme.DarkCardBorder
+import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceVariant
+import com.example.ui.theme.GrayText
+import com.example.ui.theme.OffWhite
+import com.example.ui.theme.PurpleBright
+import com.example.ui.theme.PurplePrimary
+import com.example.ui.theme.White
 
 @Composable
 fun BallisticsScreen(
@@ -61,26 +62,65 @@ fun BallisticsScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(scrollState)
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
-        TabRow(
-            selectedTabIndex = selectedTab,
-            containerColor = NetflixDarkSurface,
-            contentColor = NetflixRed,
-            indicator = { tabPositions ->
-                TabRowDefaults.SecondaryIndicator(
-                    modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                    color = NetflixRed
-                )
-            },
-            modifier = Modifier.testTag("ballistics_tab_row")
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = DarkSurface,
+            border = BorderStroke(1.dp, DarkCardBorder)
         ) {
-            Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("TNT ACCELERATOR", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("TRIDENT KILLER", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
-            Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("BOAT LAUNCHER", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold) })
+            TabRow(
+                selectedTabIndex = selectedTab,
+                containerColor = DarkSurface,
+                contentColor = PurpleBright,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
+                        color = PurplePrimary
+                    )
+                },
+                modifier = Modifier.testTag("ballistics_tab_row")
+            ) {
+                Tab(
+                    selected = selectedTab == 0,
+                    onClick = { selectedTab = 0 },
+                    text = {
+                        Text(
+                            "TNT ACCELERATOR",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 0) PurpleBright else GrayText
+                        )
+                    }
+                )
+                Tab(
+                    selected = selectedTab == 1,
+                    onClick = { selectedTab = 1 },
+                    text = {
+                        Text(
+                            "TRIDENT KILLER",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 1) PurpleBright else GrayText
+                        )
+                    }
+                )
+                Tab(
+                    selected = selectedTab == 2,
+                    onClick = { selectedTab = 2 },
+                    text = {
+                        Text(
+                            "BOAT LAUNCHER",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Medium,
+                            color = if (selectedTab == 2) PurpleBright else GrayText
+                        )
+                    }
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         when (selectedTab) {
             0 -> TNTAcceleratorSection(onSaveBlueprint)
@@ -104,33 +144,34 @@ private fun TNTAcceleratorSection(
         subtitle = "Propellant explosion vectors and payload synchronization (MCBE)",
         trailingTag = "${result.tntCount} TNT"
     ) {
-        Text("LAUNCH PAYLOAD ENTITY", style = MaterialTheme.typography.labelSmall, color = NetflixGray)
-        Spacer(modifier = Modifier.height(6.dp))
+        Text("LAUNCH PAYLOAD ENTITY", style = MaterialTheme.typography.labelSmall, color = GrayText)
+        Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             listOf("TNT", "Boat", "Player", "Trident").forEach { type ->
+                val isSelected = entityType == type
                 Surface(
                     onClick = { entityType = type },
-                    shape = RoundedCornerShape(4.dp),
-                    color = if (entityType == type) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (entityType == type) NetflixRed else NetflixCardBorder)
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) PurplePrimary.copy(alpha = 0.2f) else DarkSurfaceVariant,
+                    border = BorderStroke(1.dp, if (isSelected) PurplePrimary else DarkCardBorder)
                 ) {
                     Text(
                         text = type.uppercase(),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (entityType == type) FontWeight.Bold else FontWeight.Normal,
-                        color = if (entityType == type) NetflixRedBright else NetflixOffWhite,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) PurpleBright else OffWhite,
+                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         NumericInputField(
             value = tntCount,
@@ -143,14 +184,15 @@ private fun TNTAcceleratorSection(
             helperText = "Type any TNT count. Discharging in water creates impulse without terrain destruction."
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
+            border = BorderStroke(1.dp, DarkCardBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 BallisticRow("Estimated Horizontal Reach:", "~${result.estimatedDistanceBlocks.toInt()} blocks")
                 BallisticRow("Horizontal Velocity Vector (Vx):", String.format("%.2f m/s", result.estimatedHorizontalVelocity))
                 BallisticRow("Vertical Velocity Vector (Vy):", String.format("%.2f m/s", result.estimatedVerticalVelocity))
@@ -159,7 +201,7 @@ private fun TNTAcceleratorSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         BedrockTipCard(
             title = "Bedrock Water Chamber Mechanics",
@@ -167,7 +209,7 @@ private fun TNTAcceleratorSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(14.dp))
+    Spacer(modifier = Modifier.height(18.dp))
 
     Button(
         onClick = {
@@ -178,13 +220,13 @@ private fun TNTAcceleratorSection(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NetflixRed),
-        shape = RoundedCornerShape(6.dp)
+            .height(54.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+        shape = RoundedCornerShape(10.dp)
     ) {
-        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = NetflixWhite)
+        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = White)
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Save Ballistics Setup to Blueprints", color = NetflixWhite, fontWeight = FontWeight.Bold)
+        Text("Save Ballistics Setup to Blueprints", color = White, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -222,52 +264,61 @@ private fun TridentKillerSection(
             helperText = "4 pistons in a loop gives the fastest consistent hit rate (~2.0 hits/s)."
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Impaling V (2.5x in water/rain):", style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Impaling V (2.5x in water/rain)", style = MaterialTheme.typography.bodyMedium, color = OffWhite)
+                Text("Applies to all mobs submerged in water", style = MaterialTheme.typography.labelSmall, color = GrayText)
+            }
             Button(
                 onClick = { hasImpaling = !hasImpaling },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (hasImpaling) NetflixRed else NetflixDarkSurfaceVariant
+                    containerColor = if (hasImpaling) PurplePrimary else DarkSurfaceVariant
                 ),
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, if (hasImpaling) PurpleBright else DarkCardBorder)
             ) {
-                Text(if (hasImpaling) "ON" else "OFF", color = if (hasImpaling) NetflixWhite else NetflixOffWhite, style = MaterialTheme.typography.labelSmall)
+                Text(if (hasImpaling) "ON" else "OFF", color = if (hasImpaling) White else OffWhite, style = MaterialTheme.typography.labelMedium)
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Player Holding Looting III Sword:", style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
+            Column(modifier = Modifier.weight(1f)) {
+                Text("Player Holding Looting III Sword", style = MaterialTheme.typography.bodyMedium, color = OffWhite)
+                Text("Trident kills inherit equipped mainhand enchantments", style = MaterialTheme.typography.labelSmall, color = GrayText)
+            }
             Button(
                 onClick = { holdingLooting3 = !holdingLooting3 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = if (holdingLooting3) NetflixRed else NetflixDarkSurfaceVariant
+                    containerColor = if (holdingLooting3) PurplePrimary else DarkSurfaceVariant
                 ),
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(8.dp),
+                border = BorderStroke(1.dp, if (holdingLooting3) PurpleBright else DarkCardBorder)
             ) {
-                Text(if (holdingLooting3) "YES" else "NO", color = if (holdingLooting3) NetflixWhite else NetflixOffWhite, style = MaterialTheme.typography.labelSmall)
+                Text(if (holdingLooting3) "YES" else "NO", color = if (holdingLooting3) White else OffWhite, style = MaterialTheme.typography.labelMedium)
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
+            border = BorderStroke(1.dp, DarkCardBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 BallisticRow("Damage per Hit:", "${String.format("%.1f", effectiveDamage)} HP")
                 BallisticRow("Hit Frequency:", "$hitsPerSec hits/second")
                 BallisticRow("Total Chamber DPS:", "${String.format("%.1f", dps)} DPS")
@@ -276,7 +327,7 @@ private fun TridentKillerSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         BedrockTipCard(
             title = "Crucial Bedrock Feature",
@@ -284,7 +335,7 @@ private fun TridentKillerSection(
         )
     }
 
-    Spacer(modifier = Modifier.height(14.dp))
+    Spacer(modifier = Modifier.height(18.dp))
 
     Button(
         onClick = {
@@ -295,13 +346,13 @@ private fun TridentKillerSection(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = NetflixRed),
-        shape = RoundedCornerShape(6.dp)
+            .height(54.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+        shape = RoundedCornerShape(10.dp)
     ) {
-        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = NetflixWhite)
+        Icon(Icons.Default.BookmarkAdd, contentDescription = null, tint = White)
         Spacer(modifier = Modifier.width(8.dp))
-        Text("Save Trident Killer Setup to Blueprints", color = NetflixWhite, fontWeight = FontWeight.Bold)
+        Text("Save Trident Killer Setup to Blueprints", color = White, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -323,37 +374,38 @@ private fun BoatLauncherSection(
         subtitle = "Piston launch acceleration and high-speed nether transport",
         trailingTag = iceName
     ) {
-        Text("ICE SURFACE TYPE", style = MaterialTheme.typography.labelSmall, color = NetflixGray)
-        Spacer(modifier = Modifier.height(6.dp))
+        Text("ICE SURFACE TYPE", style = MaterialTheme.typography.labelSmall, color = GrayText)
+        Spacer(modifier = Modifier.height(10.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             listOf(
                 "BLUE ICE (72 m/s)" to 2,
                 "PACKED ICE (40 m/s)" to 1,
                 "REGULAR ICE" to 0
             ).forEach { (label, type) ->
+                val isSelected = iceType == type
                 Surface(
                     onClick = { iceType = type },
-                    shape = RoundedCornerShape(4.dp),
-                    color = if (iceType == type) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (iceType == type) NetflixRed else NetflixCardBorder)
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) PurplePrimary.copy(alpha = 0.2f) else DarkSurfaceVariant,
+                    border = BorderStroke(1.dp, if (isSelected) PurplePrimary else DarkCardBorder)
                 ) {
                     Text(
                         text = label,
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (iceType == type) FontWeight.Bold else FontWeight.Normal,
-                        color = if (iceType == type) NetflixRedBright else NetflixOffWhite,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) PurpleBright else OffWhite,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         NumericInputField(
             value = pistonBoosters,
@@ -366,14 +418,15 @@ private fun BoatLauncherSection(
             helperText = "Type number of sequential launch pistons."
         )
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(18.dp))
 
         Surface(
-            shape = RoundedCornerShape(6.dp),
-            color = NetflixDarkSurfaceVariant,
+            shape = RoundedCornerShape(10.dp),
+            color = DarkSurfaceVariant,
+            border = BorderStroke(1.dp, DarkCardBorder),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 BallisticRow("Maximum Cruising Speed:", topSpeed)
                 BallisticRow("Piston Timing Interval:", "2 Redstone Ticks per piston")
                 BallisticRow("Launch Acceleration:", "Instant full-speed glide")
@@ -381,7 +434,7 @@ private fun BoatLauncherSection(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         BedrockTipCard(
             title = "Piston Timing Caution",
@@ -394,9 +447,10 @@ private fun BoatLauncherSection(
 private fun BallisticRow(label: String, value: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(label, style = MaterialTheme.typography.bodySmall, color = NetflixGray)
-        Text(value, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold, color = NetflixOffWhite)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = GrayText)
+        Text(value, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold, color = OffWhite)
     }
 }

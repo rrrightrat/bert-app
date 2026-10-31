@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,15 +40,15 @@ import androidx.compose.ui.unit.sp
 import com.example.data.model.BedrockKnowledgeBase
 import com.example.data.model.MechanicGuide
 import com.example.ui.theme.AccentAmber
-import com.example.ui.theme.NetflixCardBorder
-import com.example.ui.theme.NetflixDarkSurface
-import com.example.ui.theme.NetflixDarkSurfaceVariant
-import com.example.ui.theme.NetflixGray
-import com.example.ui.theme.NetflixMuted
-import com.example.ui.theme.NetflixOffWhite
-import com.example.ui.theme.NetflixRed
-import com.example.ui.theme.NetflixRedBright
-import com.example.ui.theme.NetflixWhite
+import com.example.ui.theme.DarkCardBorder
+import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DarkSurfaceVariant
+import com.example.ui.theme.GrayText
+import com.example.ui.theme.MutedText
+import com.example.ui.theme.OffWhite
+import com.example.ui.theme.PurpleBright
+import com.example.ui.theme.PurplePrimary
+import com.example.ui.theme.White
 
 @Composable
 fun MechanicsScreen() {
@@ -68,37 +69,37 @@ fun MechanicsScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 20.dp, vertical = 12.dp)
     ) {
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { searchQuery = it },
-            placeholder = { Text("Search Bedrock mechanics, quirks, or tags...", style = MaterialTheme.typography.bodySmall, color = NetflixMuted) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = NetflixGray) },
+            placeholder = { Text("Search Bedrock mechanics, quirks, or tags...", style = MaterialTheme.typography.bodyMedium, color = MutedText) },
+            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = GrayText) },
             trailingIcon = {
                 if (searchQuery.isNotBlank()) {
                     IconButton(onClick = { searchQuery = "" }) {
-                        Icon(Icons.Default.Clear, contentDescription = "Clear", tint = NetflixGray)
+                        Icon(Icons.Default.Clear, contentDescription = "Clear", tint = GrayText)
                     }
                 }
             },
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = NetflixRed,
-                unfocusedBorderColor = NetflixCardBorder,
-                focusedContainerColor = NetflixDarkSurface,
-                unfocusedContainerColor = NetflixDarkSurface,
-                cursorColor = NetflixRed,
-                focusedTextColor = NetflixWhite,
-                unfocusedTextColor = NetflixWhite
+                focusedBorderColor = PurplePrimary,
+                unfocusedBorderColor = DarkCardBorder,
+                focusedContainerColor = DarkSurface,
+                unfocusedContainerColor = DarkSurface,
+                cursorColor = PurplePrimary,
+                focusedTextColor = White,
+                unfocusedTextColor = White
             ),
-            shape = RoundedCornerShape(6.dp),
+            shape = RoundedCornerShape(10.dp),
             modifier = Modifier
                 .fillMaxWidth()
                 .testTag("mechanics_search_field")
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         Row(
             modifier = Modifier
@@ -107,37 +108,38 @@ fun MechanicsScreen() {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             categories.forEach { cat ->
+                val isSelected = selectedCategory == cat
                 Surface(
                     onClick = { selectedCategory = cat },
-                    shape = RoundedCornerShape(4.dp),
-                    color = if (selectedCategory == cat) NetflixRed.copy(alpha = 0.2f) else NetflixDarkSurfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, if (selectedCategory == cat) NetflixRed else NetflixCardBorder)
+                    shape = RoundedCornerShape(8.dp),
+                    color = if (isSelected) PurplePrimary.copy(alpha = 0.2f) else DarkSurfaceVariant,
+                    border = BorderStroke(1.dp, if (isSelected) PurplePrimary else DarkCardBorder)
                 ) {
                     Text(
                         text = cat.replace("_", " "),
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = if (selectedCategory == cat) FontWeight.Bold else FontWeight.Normal,
-                        color = if (selectedCategory == cat) NetflixRedBright else NetflixOffWhite,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isSelected) PurpleBright else OffWhite,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
             text = "${filteredList.size} MCBE MECHANICAL SPECIFICATIONS",
             style = MaterialTheme.typography.labelSmall,
-            color = NetflixMuted,
+            color = MutedText,
             letterSpacing = 1.sp
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(filteredList, key = { it.id }) { guide ->
                 MechanicCard(guide = guide)
@@ -150,14 +152,11 @@ fun MechanicsScreen() {
 private fun MechanicCard(guide: MechanicGuide) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(containerColor = NetflixDarkSurface),
-        border = CardDefaults.outlinedCardBorder().copy(
-            brush = androidx.compose.ui.graphics.SolidColor(NetflixCardBorder),
-            width = 1.dp
-        )
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = DarkSurface),
+        border = BorderStroke(1.dp, DarkCardBorder)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -165,47 +164,48 @@ private fun MechanicCard(guide: MechanicGuide) {
             ) {
                 Text(
                     text = guide.title,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = NetflixWhite,
+                    color = White,
                     modifier = Modifier.weight(1f)
                 )
                 Surface(
-                    shape = RoundedCornerShape(3.dp),
-                    color = NetflixDarkSurfaceVariant,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, NetflixRed.copy(alpha = 0.5f))
+                    shape = RoundedCornerShape(6.dp),
+                    color = DarkSurfaceVariant,
+                    border = BorderStroke(1.dp, PurplePrimary.copy(alpha = 0.5f))
                 ) {
                     Text(
                         text = guide.category,
                         style = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp),
-                        color = NetflixRedBright,
+                        color = PurpleBright,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = guide.summary,
                 style = MaterialTheme.typography.bodyMedium,
-                color = NetflixGray
+                color = GrayText
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Surface(
-                shape = RoundedCornerShape(6.dp),
-                color = NetflixDarkSurfaceVariant,
+                shape = RoundedCornerShape(10.dp),
+                color = DarkSurfaceVariant,
+                border = BorderStroke(1.dp, DarkCardBorder),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Text("JAVA EDITION DIFFERENCE:", style = MaterialTheme.typography.labelSmall, color = AccentAmber)
-                    Text(guide.javaDifference, style = MaterialTheme.typography.bodySmall, color = NetflixOffWhite)
+                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("JAVA EDITION DIFFERENCE:", style = MaterialTheme.typography.labelSmall, color = AccentAmber, fontWeight = FontWeight.Bold)
+                    Text(guide.javaDifference, style = MaterialTheme.typography.bodySmall, color = OffWhite)
 
-                    Spacer(modifier = Modifier.height(2.dp))
-                    Text("BEDROCK SOLUTION & BEST PRACTICE:", style = MaterialTheme.typography.labelSmall, color = NetflixRedBright)
-                    Text(guide.practicalSolution, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = NetflixWhite)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("BEDROCK SOLUTION & BEST PRACTICE:", style = MaterialTheme.typography.labelSmall, color = PurpleBright, fontWeight = FontWeight.Bold)
+                    Text(guide.practicalSolution, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold, color = White)
                 }
             }
         }
