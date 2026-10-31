@@ -15,7 +15,7 @@ Designed with a sleek, minimalist dark aesthetic, BERT gives technical Bedrock b
 
 You can always download the latest compiled Android application directly from the GitHub repository:
 
-1. **Go to Releases:** Navigate to the [**Releases**](https://github.com/rrrightrat/BERT/releases) page of this repository.
+1. **Go to Releases:** Navigate to the [**Releases**](https://github.com/rrrightrat/bert-app/releases) page of this repository.
 2. **Find the Latest Release:** Look for the release tagged as **Latest** (e.g., `v1.0.0` or higher).
 3. **Download the APK:** Under the **Assets** section at the bottom of the release notes, click on **`BERT-debug.apk`** (or `BERT.apk`) to download the installer directly to your device.
 4. **Install on Android:**
