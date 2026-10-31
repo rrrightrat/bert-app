@@ -111,5 +111,5 @@ gradle :app:testDebugUnitTest
 
 ## 👤 Credits & Attribution
 
-* **Original Concept & Research:** [RR Right Rat](https://www.youtube.com/@rightrat)
+* **Original Concept & Research:** [RR Right Rat](https://www.youtube.com/@rrrightrat)
 * **Target Engine:** Minecraft Bedrock Edition (MCBE) 1.21+ Tricky Trials & Up
