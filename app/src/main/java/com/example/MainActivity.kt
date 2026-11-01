@@ -6,9 +6,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.painterResource
+import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,18 +86,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Security
 import com.example.ui.AppScreen
+import com.example.ui.CommunityViewModel
 import com.example.ui.RedstoneViewModel
 import com.example.ui.screens.AboutScreen
+import com.example.ui.screens.AdminScreen
 import com.example.ui.screens.BallisticsScreen
 import com.example.ui.screens.BlueprintsScreen
+import com.example.ui.screens.CommunityScreen
 import com.example.ui.screens.ComparatorScreen
 import com.example.ui.screens.ComponentDatabaseScreen
+import com.example.ui.screens.CreatePostScreen
 import com.example.ui.screens.HomeScreen
 import com.example.ui.screens.ItemSorterScreen
 import com.example.ui.screens.LogicScreen
 import com.example.ui.screens.MechanicsScreen
 import com.example.ui.screens.TimingScreen
+import com.example.ui.screens.UserProfileScreen
 import com.example.ui.theme.BERTTheme
 import com.example.ui.theme.CozyLanternAmber
 import com.example.ui.theme.DarkBackground
@@ -142,9 +153,64 @@ fun GridDotsMenuIcon(tint: Color = White, modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun StartSplashScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .testTag("app_start_splash_screen"),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.bert_logo),
+                contentDescription = "BERT Logo",
+                modifier = Modifier
+                    .size(160.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .border(1.dp, Color(0xFF222222), RoundedCornerShape(24.dp))
+                    .testTag("splash_logo")
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "BERT",
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Black,
+                color = White,
+                letterSpacing = 4.sp
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Bedrock Edition Redstone Toolkit",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = GrayText
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
+fun BERTApp(
+    viewModel: RedstoneViewModel = viewModel(),
+    communityViewModel: CommunityViewModel = viewModel()
+) {
+    var isSplashScreenVisible by remember { mutableStateOf(true) }
+
+    LaunchedEffect(Unit) {
+        delay(800L)
+        isSplashScreenVisible = false
+    }
+
     val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
     val blueprints by viewModel.allBlueprints.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -153,22 +219,38 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
     var showToolsSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        viewModel.snackbarMessage.collect { message ->
-            snackbarHostState.showSnackbar(message)
+        coroutineScope.launch {
+            viewModel.snackbarMessage.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+        coroutineScope.launch {
+            communityViewModel.message.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
         }
     }
 
-    // Hardware back button smoothly returns to HOME or closes drawer
-    BackHandler(enabled = drawerState.isOpen || currentScreen != AppScreen.HOME) {
-        if (drawerState.isOpen) {
-            coroutineScope.launch { drawerState.close() }
+    Crossfade(targetState = isSplashScreenVisible, label = "splashTransition") { showSplash ->
+        if (showSplash) {
+            StartSplashScreen()
         } else {
-            viewModel.navigateTo(AppScreen.HOME)
-        }
-    }
+            // Hardware back button smoothly returns to previous screen or closes drawer
+            BackHandler(enabled = drawerState.isOpen || currentScreen != AppScreen.HOME) {
+                if (drawerState.isOpen) {
+                    coroutineScope.launch { drawerState.close() }
+                } else {
+                    when (currentScreen) {
+                        AppScreen.CREATE_POST -> viewModel.navigateTo(AppScreen.COMMUNITY)
+                        AppScreen.USER_PROFILE -> viewModel.navigateTo(AppScreen.COMMUNITY)
+                        AppScreen.ADMIN -> viewModel.navigateTo(AppScreen.USER_PROFILE)
+                        else -> viewModel.navigateTo(AppScreen.HOME)
+                    }
+                }
+            }
 
-    // Modal Navigation Drawer
-    ModalNavigationDrawer(
+            // Modal Navigation Drawer
+            ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet(
@@ -242,6 +324,9 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
 
                     val drawerItems = listOf(
                         DrawerItem(AppScreen.HOME, "Home Dashboard", Icons.Default.Home),
+                        DrawerItem(AppScreen.COMMUNITY, "Redstone Community", Icons.Default.Forum, badgeText = "Cloud"),
+                        DrawerItem(AppScreen.USER_PROFILE, "My Profile & Posts", Icons.Default.Person),
+                        DrawerItem(AppScreen.ADMIN, "Admin Control Center", Icons.Default.Security, badgeText = "SECURE"),
                         DrawerItem(AppScreen.COMPONENTS, "Component Database", Icons.Default.Category, badgeText = "25+"),
                         DrawerItem(AppScreen.COMPARATOR, "Comparator & Signals", Icons.Default.Tune),
                         DrawerItem(AppScreen.TIMING, "Timings & Etho Clocks", Icons.Default.Timer),
@@ -360,14 +445,22 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
                             }
                         } else {
                             IconButton(
-                                onClick = { viewModel.navigateTo(AppScreen.HOME) },
+                                onClick = {
+                                    if (currentScreen == AppScreen.CREATE_POST || currentScreen == AppScreen.USER_PROFILE) {
+                                        viewModel.navigateTo(AppScreen.COMMUNITY)
+                                    } else if (currentScreen == AppScreen.ADMIN) {
+                                        viewModel.navigateTo(AppScreen.USER_PROFILE)
+                                    } else {
+                                        viewModel.navigateTo(AppScreen.HOME)
+                                    }
+                                },
                                 modifier = Modifier
                                     .padding(start = 8.dp)
                                     .testTag("nav_back_button")
                             ) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Back to Home",
+                                    contentDescription = "Back",
                                     tint = White
                                 )
                             }
@@ -382,14 +475,15 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
                                 modifier = Modifier
                                     .size(28.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(PurplePrimary),
+                                    .background(Color.Black)
+                                    .border(1.dp, Color(0xFF444444), RoundedCornerShape(8.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = "B",
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Black,
-                                    color = Color.Black
+                                    color = White
                                 )
                             }
                             Spacer(modifier = Modifier.width(10.dp))
@@ -402,6 +496,18 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
                         }
                     },
                     actions = {
+                        IconButton(
+                            onClick = { viewModel.navigateTo(AppScreen.COMMUNITY) },
+                            modifier = Modifier
+                                .padding(end = 4.dp)
+                                .testTag("action_community")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Forum,
+                                contentDescription = "Community Creations",
+                                tint = if (currentScreen == AppScreen.COMMUNITY || currentScreen == AppScreen.CREATE_POST || currentScreen == AppScreen.USER_PROFILE) PurpleBright else GrayText
+                            )
+                        }
                         IconButton(
                             onClick = { viewModel.navigateTo(AppScreen.BLUEPRINTS) },
                             modifier = Modifier
@@ -437,47 +543,53 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
                     )
                 )
             },
-            // Bottom bar removed as requested, replaced with circular Tools button at bottom right corner
+            // Bottom bar removed as requested, replaced with circular Tools button at bottom right corner (hidden on Community & related screens)
             floatingActionButton = {
-                Surface(
-                    onClick = { showToolsSheet = true },
-                    shape = CircleShape,
-                    color = PurplePrimary,
-                    shadowElevation = 10.dp,
-                    border = androidx.compose.foundation.BorderStroke(2.dp, PurpleBright),
-                    modifier = Modifier
-                        .windowInsetsPadding(WindowInsets.navigationBars)
-                        .padding(bottom = 8.dp, end = 4.dp)
-                        .size(68.dp)
-                        .testTag("btn_bottom_tools_circle")
+                if (currentScreen != AppScreen.COMMUNITY &&
+                    currentScreen != AppScreen.CREATE_POST &&
+                    currentScreen != AppScreen.USER_PROFILE &&
+                    currentScreen != AppScreen.ADMIN
                 ) {
-                    Box(
+                    Surface(
+                        onClick = { showToolsSheet = true },
+                        shape = CircleShape,
+                        color = PurplePrimary,
+                        shadowElevation = 10.dp,
+                        border = androidx.compose.foundation.BorderStroke(2.dp, PurpleBright),
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(PurpleBright, PurplePrimary)
-                                )
-                            ),
-                        contentAlignment = Alignment.Center
+                            .windowInsetsPadding(WindowInsets.navigationBars)
+                            .padding(bottom = 8.dp, end = 4.dp)
+                            .size(68.dp)
+                            .testTag("btn_bottom_tools_circle")
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(PurpleBright, PurplePrimary)
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Build,
-                                contentDescription = "Tools",
-                                tint = Color.Black,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = "Tools",
-                                style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
-                                fontWeight = FontWeight.Black,
-                                color = Color.Black
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Build,
+                                    contentDescription = "Tools",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = "Tools",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontSize = 11.sp),
+                                    fontWeight = FontWeight.Black,
+                                    color = Color.Black
+                                )
+                            }
                         }
                     }
                 }
@@ -544,6 +656,48 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
                                 onAddBlueprint = { title, cat, desc, config ->
                                     viewModel.saveBlueprint(title, cat, desc, config)
                                 }
+                            )
+                        }
+                        AppScreen.COMMUNITY -> {
+                            CommunityScreen(
+                                viewModel = communityViewModel,
+                                onNavigateToCreatePost = {
+                                    communityViewModel.setPostToEdit(null)
+                                    viewModel.navigateTo(AppScreen.CREATE_POST)
+                                },
+                                onNavigateToUserProfile = {
+                                    viewModel.navigateTo(AppScreen.USER_PROFILE)
+                                }
+                            )
+                        }
+                        AppScreen.CREATE_POST -> {
+                            CreatePostScreen(
+                                viewModel = communityViewModel,
+                                existingPost = communityViewModel.postToEdit.collectAsStateWithLifecycle().value,
+                                onNavigateBack = { viewModel.navigateTo(AppScreen.COMMUNITY) }
+                            )
+                        }
+                        AppScreen.USER_PROFILE -> {
+                            UserProfileScreen(
+                                viewModel = communityViewModel,
+                                onNavigateBack = { viewModel.navigateTo(AppScreen.COMMUNITY) },
+                                onNavigateToCreatePost = {
+                                    communityViewModel.setPostToEdit(null)
+                                    viewModel.navigateTo(AppScreen.CREATE_POST)
+                                },
+                                onEditPost = { post ->
+                                    communityViewModel.setPostToEdit(post)
+                                    viewModel.navigateTo(AppScreen.CREATE_POST)
+                                },
+                                onNavigateToAdmin = {
+                                    viewModel.navigateTo(AppScreen.ADMIN)
+                                }
+                            )
+                        }
+                        AppScreen.ADMIN -> {
+                            AdminScreen(
+                                viewModel = communityViewModel,
+                                onNavigateBack = { viewModel.navigateTo(AppScreen.USER_PROFILE) }
                             )
                         }
                         AppScreen.ABOUT -> {
@@ -616,6 +770,26 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
                 Spacer(modifier = Modifier.height(18.dp))
 
                 val toolsList = listOf(
+                    ToolOption(
+                        screen = AppScreen.COMMUNITY,
+                        title = "Community Creations",
+                        subtitle = "Browse, post, like & comment on community Bedrock redstone contraptions",
+                        icon = Icons.Default.Forum,
+                        badge = "COMMUNITY"
+                    ),
+                    ToolOption(
+                        screen = AppScreen.USER_PROFILE,
+                        title = "Creator Profile & My Posts",
+                        subtitle = "Manage your published contraptions, stats and account",
+                        icon = Icons.Default.Person
+                    ),
+                    ToolOption(
+                        screen = AppScreen.ADMIN,
+                        title = "Admin Control Center",
+                        subtitle = "Manage, ban, delete accounts & community creations",
+                        icon = Icons.Default.Security,
+                        badge = "ADMIN"
+                    ),
                     ToolOption(
                         screen = AppScreen.COMPONENTS,
                         title = "Component Database",
@@ -752,6 +926,8 @@ fun BERTApp(viewModel: RedstoneViewModel = viewModel()) {
 
                 Spacer(modifier = Modifier.height(32.dp))
             }
+        }
+    }
         }
     }
 }

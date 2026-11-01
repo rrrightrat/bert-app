@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidUser(data) {
+      return data.uid is string && data.uid.size() > 0 && data.uid.size() <= 128
+        && data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 100
+        && (!('email' in data) || (data.email is string && data.email.size() <= 200))
+        && (!('photoUrl' in data) || (data.photoUrl is string && data.photoUrl.size() <= 4096))
+        && (!('bio' in data) || (data.bio is string && data.bio.size() <= 1000))
+        && (!('role' in data) || (data.role is string && data.role.size() <= 20))
+        && (!('isBanned' in data) || (data.isBanned is bool))
+        && (!('banReason' in data) || (data.banReason is string && data.banReason.size() <= 500));
+    }
+
+    function isValidPost(data) {
+      return data.authorId is string && data.authorId.size() > 0 && data.authorId.size() <= 128
+        && data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 100
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 200
+        && data.content is string && data.content.size() > 0 && data.content.size() <= 20000
+        && (!('id' in data) || (data.id is string && data.id.size() <= 128))
+        && (!('authorPhotoUrl' in data) || (data.authorPhotoUrl is string && data.authorPhotoUrl.size() <= 4096))
+        && (!('category' in data) || (data.category is string && data.category.size() <= 50))
+        && (!('headingStyle' in data) || (data.headingStyle is string && data.headingStyle.size() <= 20))
+        && (!('fontFamily' in data) || (data.fontFamily is string && data.fontFamily.size() <= 30))
+        && (!('textColorHex' in data) || (data.textColorHex is string && data.textColorHex.size() <= 20))
+        && (!('mediaUrl' in data) || (data.mediaUrl is string && data.mediaUrl.size() <= 500000))
+        && (!('mediaType' in data) || (data.mediaType is string && data.mediaType.size() <= 20))
+        && (!('likesCount' in data) || (data.likesCount is int))
+        && (!('dislikesCount' in data) || (data.dislikesCount is int))
+        && (!('commentsCount' in data) || (data.commentsCount is int))
+        && (!('likedUserIds' in data) || (data.likedUserIds is list && data.likedUserIds.size() <= 5000))
+        && (!('dislikedUserIds' in data) || (data.dislikedUserIds is list && data.dislikedUserIds.size() <= 5000));
+    }
+
+    function isValidComment(data) {
+      return data.postId is string && data.postId.size() > 0 && data.postId.size() <= 128
+        && data.authorId is string && data.authorId.size() > 0 && data.authorId.size() <= 128
+        && data.authorName is string && data.authorName.size() > 0 && data.authorName.size() <= 100
+        && data.text is string && data.text.size() > 0 && data.text.size() <= 2000
+        && (!('id' in data) || (data.id is string && data.id.size() <= 128))
+        && (!('authorPhotoUrl' in data) || (data.authorPhotoUrl is string && data.authorPhotoUrl.size() <= 4096));
+    }
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if isValidUser(request.resource.data);
+      allow delete: if true;
+    }
+
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isValidPost(request.resource.data);
+      allow update: if isValidPost(request.resource.data);
+      allow delete: if true;
+
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isValidComment(request.resource.data);
+        allow update: if isValidComment(request.resource.data);
+        allow delete: if true;
+      }
+    }
+  }
+}

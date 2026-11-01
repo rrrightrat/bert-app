@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,6 +30,7 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Memory
@@ -221,6 +223,17 @@ fun HomeScreen(
                 specs = "$savedBlueprintsCount Blueprints"
             ),
             FeatureItem(
+                screen = AppScreen.COMMUNITY,
+                title = "Redstone Community",
+                subtitle = "Share contraptions, post photos and videos with custom fonts/colors, like & comment on cloud circuits.",
+                category = "COMMUNITY",
+                categoryPill = "Cloud",
+                icon = Icons.Default.RocketLaunch,
+                tag = "CLOUD FEED",
+                tabGroup = "Popular",
+                specs = "Creations & Cloud"
+            ),
+            FeatureItem(
                 screen = AppScreen.ABOUT,
                 title = "About BERT & Community",
                 subtitle = "Technical research, community attribution (RR Right Rat), and MCBE redstone manual.",
@@ -324,6 +337,139 @@ fun HomeScreen(
                     fontWeight = FontWeight.Black,
                     color = White
                 )
+            }
+        }
+
+        // Checkout the Community Highlight Card
+        item {
+            Surface(
+                onClick = { onSelectScreen(AppScreen.COMMUNITY) },
+                shape = RoundedCornerShape(20.dp),
+                color = DarkSurface,
+                border = androidx.compose.foundation.BorderStroke(1.5.dp, PurpleBright),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("home_checkout_community_card")
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            Brush.horizontalGradient(
+                                listOf(
+                                    Color(0xFF28113B),
+                                    Color(0xFF1B0E2A),
+                                    DarkSurface
+                                )
+                            )
+                        )
+                        .padding(18.dp)
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(PurpleContainer)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        Icons.Default.Forum,
+                                        contentDescription = null,
+                                        tint = PurpleBright,
+                                        modifier = Modifier.size(13.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Text(
+                                        text = "NEW CLOUD FEED",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = PurpleBright
+                                    )
+                                }
+                            }
+
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF4ADE80))
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "LIVE",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF4ADE80)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        Text(
+                            text = "Checkout the Community!",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Black,
+                            color = White
+                        )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Text(
+                            text = "Browse, like, and comment on player contraptions with custom text styles, diagrams, and video attachments.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = GrayText,
+                            lineHeight = 18.sp
+                        )
+
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Piston doors • Clocks • Logic ALU • Cannons",
+                                fontSize = 11.sp,
+                                color = MutedText,
+                                maxLines = 1,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Button(
+                                onClick = { onSelectScreen(AppScreen.COMMUNITY) },
+                                colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
+                                shape = RoundedCornerShape(10.dp),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                                modifier = Modifier.testTag("home_join_community_btn")
+                            ) {
+                                Text(
+                                    text = "Explore Feed",
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black,
+                                    fontSize = 12.sp
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = null,
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 

@@ -18,6 +18,9 @@ import kotlinx.coroutines.launch
 
 enum class AppScreen(val title: String, val iconLabel: String) {
     HOME("Home", "HOME"),
+    COMMUNITY("Community", "FEED"),
+    CREATE_POST("New Creation", "POST"),
+    USER_PROFILE("My Profile", "USER"),
     COMPONENTS("Component DB", "DB"),
     COMPARATOR("Comparator", "CMP"),
     TIMING("Timings", "CLK"),
@@ -26,7 +29,8 @@ enum class AppScreen(val title: String, val iconLabel: String) {
     LOGIC("Logic", "LOGIC"),
     MECHANICS("Quirks", "MCBE"),
     BLUEPRINTS("Presets", "PRESET"),
-    ABOUT("About", "ABOUT")
+    ABOUT("About", "ABOUT"),
+    ADMIN("Admin Panel", "ADMIN")
 }
 
 class RedstoneViewModel(application: Application) : AndroidViewModel(application) {

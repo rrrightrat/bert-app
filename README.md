@@ -1,5 +1,9 @@
 # BERT — Bedrock Edition Redstone Toolkit
 
+<p align="center">
+  <img src="docs/images/bert_logo.png" alt="BERT Logo" width="220" />
+</p>
+
 [![Minecraft Bedrock](https://img.shields.io/badge/Minecraft-Bedrock%201.21%2B-darkred?logo=minecraft)](https://www.minecraft.net/)
 [![Platform](https://img.shields.io/badge/Platform-Android-green?logo=android)](https://www.android.com/)
 [![UI](https://img.shields.io/badge/UI-Jetpack%20Compose%20%7C%20Material%203-blue?logo=jetpackcompose)](https://developer.android.com/jetpack/compose)
