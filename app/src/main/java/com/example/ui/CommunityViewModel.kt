@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -28,12 +29,20 @@ class CommunityViewModel(application: Application) : AndroidViewModel(applicatio
 
     val currentUser: StateFlow<CommunityUser?> = authManager.currentUser
 
-    // Admin Security & Access Control
-    private val _isAdminAuthenticated = MutableStateFlow(false)
-    val isAdminAuthenticated: StateFlow<Boolean> = _isAdminAuthenticated.asStateFlow()
-
-    // Master Admin email matching the project owner
+    // Master Admin email matching the project owner Google account
     val masterAdminEmail = "rrrightrat@gmail.com"
+
+    // Real-time authentication state directly tied to Google Account login
+    val isMasterAdmin: StateFlow<Boolean> = currentUser.map { user ->
+        user?.email.equals(masterAdminEmail, ignoreCase = true)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false
+    )
+
+    // Admin authentication is granted exclusively when logged into the master Google account
+    val isAdminAuthenticated: StateFlow<Boolean> = isMasterAdmin
 
     // Real-time flow of all users for Admin management
     val allUsers: StateFlow<List<CommunityUser>> = repository.getAllUsersFlow().stateIn(
@@ -146,75 +155,18 @@ class CommunityViewModel(application: Application) : AndroidViewModel(applicatio
     }
 
     /**
-     * Admin Passcode Authentication:
-     * High-entropy Hexadecimal & Binary Cryptographic Passcode.
-     * Master Key: "0x42455254_10101101" (Hex: 0x42455254 [ASCII "BERT"], Binary: 10101101 [0xAD / 173])
-     * Also accepts variations like "0xBEEF_10101101", "0xBERT_10101101", "0xB347_10101101", or master operator email bypass.
+     * Admin Actions:
+     * Authorized exclusively for the master Google account (rrrightrat@gmail.com).
      */
-    fun authenticateAdmin(input: String): Boolean {
-        val trimmed = input.trim()
-        val userEmail = currentUser.value?.email.orEmpty()
-        val isMasterEmail = userEmail.equals(masterAdminEmail, ignoreCase = true)
-
-        val clean = trimmed.replace(" ", "_").replace("-", "_").replace(":", "_").uppercase()
-
-        // Valid Hex keys
-        val validHexes = setOf(
-            "0X42455254", "42455254",
-            "0XBEEF", "BEEF",
-            "0XBERT", "BERT",
-            "0XB347", "B347",
-            "0XDEADBEEF", "DEADBEEF"
-        )
-
-        // Valid Binary keys
-        val validBinaries = setOf(
-            "10101101",
-            "10101010",
-            "11010011",
-            "01000010",
-            "11110000",
-            "00100000"
-        )
-
-        val validCompositePasscodes = setOf(
-            "0X42455254_10101101",
-            "42455254_10101101",
-            "0XBEEF_10101101",
-            "BEEF_10101101",
-            "0XBERT_10101101",
-            "BERT_10101101",
-            "0XB347_10101101",
-            "B347_10101101",
-            "0X4245525410101101",
-            "0XBEEF10101101"
-        )
-
-        val isDirectMatch = clean in validCompositePasscodes
-
-        // Check if composite contains hex and binary separated by underscore or delimiter
-        val isSplitMatch = if (clean.contains("_")) {
-            val parts = clean.split("_")
-            parts.size >= 2 && parts[0] in validHexes && parts[1] in validBinaries
-        } else false
-
-        val isAuthorized = isDirectMatch || isSplitMatch || (isMasterEmail && trimmed.isNotBlank())
-
-        if (isAuthorized) {
-            _isAdminAuthenticated.value = true
-            viewModelScope.launch { _message.emit("Admin clearance granted. Cryptographic Hex & Binary key verified.") }
-            return true
-        }
-        viewModelScope.launch { _message.emit("Access Denied: Invalid Hex & Binary Passcode.") }
-        return false
-    }
-
-    fun lockAdmin() {
-        _isAdminAuthenticated.value = false
-        viewModelScope.launch { _message.emit("Admin session terminated.") }
+    fun isCurrentUserMasterAdmin(): Boolean {
+        return currentUser.value?.email.equals(masterAdminEmail, ignoreCase = true)
     }
 
     fun adminBanUser(userId: String, reason: String = "Policy violation") {
+        if (!isCurrentUserMasterAdmin()) {
+            viewModelScope.launch { _message.emit("Unauthorized: Master admin credentials required.") }
+            return
+        }
         viewModelScope.launch {
             val result = repository.banUser(userId, reason)
             if (result.isSuccess) {

@@ -29,6 +29,7 @@ enum class AppScreen(val title: String, val iconLabel: String) {
     LOGIC("Logic", "LOGIC"),
     MECHANICS("Quirks", "MCBE"),
     BLUEPRINTS("Presets", "PRESET"),
+    INFOGRAPHIC("Infographic Lab", "RGBA"),
     ABOUT("About", "ABOUT"),
     ADMIN("Admin Panel", "ADMIN")
 }

@@ -35,6 +35,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.RocketLaunch
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Timer
@@ -232,6 +233,17 @@ fun HomeScreen(
                 tag = "CLOUD FEED",
                 tabGroup = "Popular",
                 specs = "Creations & Cloud"
+            ),
+            FeatureItem(
+                screen = AppScreen.INFOGRAPHIC,
+                title = "Infographic Lab & Compositor",
+                subtitle = "Least-button photo compositor with 32-bit RGBA transparency and instant Discord presets.",
+                category = "TOOLS",
+                categoryPill = "Infographics",
+                icon = Icons.Default.Palette,
+                tag = "DISCORD RGBA",
+                tabGroup = "Popular",
+                specs = "32-bit RGBA"
             ),
             FeatureItem(
                 screen = AppScreen.ABOUT,

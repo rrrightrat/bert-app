@@ -87,6 +87,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
 import com.example.ui.AppScreen
@@ -96,6 +97,7 @@ import com.example.ui.screens.AboutScreen
 import com.example.ui.screens.AdminScreen
 import com.example.ui.screens.BallisticsScreen
 import com.example.ui.screens.BlueprintsScreen
+import com.example.ui.screens.InfographicScreen
 import com.example.ui.screens.CommunityScreen
 import com.example.ui.screens.ComparatorScreen
 import com.example.ui.screens.ComponentDatabaseScreen
@@ -213,6 +215,7 @@ fun BERTApp(
 
     val currentScreen by viewModel.currentScreen.collectAsStateWithLifecycle()
     val blueprints by viewModel.allBlueprints.collectAsStateWithLifecycle()
+    val isMasterAdmin by communityViewModel.isMasterAdmin.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -244,6 +247,7 @@ fun BERTApp(
                         AppScreen.CREATE_POST -> viewModel.navigateTo(AppScreen.COMMUNITY)
                         AppScreen.USER_PROFILE -> viewModel.navigateTo(AppScreen.COMMUNITY)
                         AppScreen.ADMIN -> viewModel.navigateTo(AppScreen.USER_PROFILE)
+                        AppScreen.INFOGRAPHIC -> viewModel.navigateTo(AppScreen.HOME)
                         else -> viewModel.navigateTo(AppScreen.HOME)
                     }
                 }
@@ -322,21 +326,24 @@ fun BERTApp(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
 
-                    val drawerItems = listOf(
-                        DrawerItem(AppScreen.HOME, "Home Dashboard", Icons.Default.Home),
-                        DrawerItem(AppScreen.COMMUNITY, "Redstone Community", Icons.Default.Forum, badgeText = "Cloud"),
-                        DrawerItem(AppScreen.USER_PROFILE, "My Profile & Posts", Icons.Default.Person),
-                        DrawerItem(AppScreen.ADMIN, "Admin Control Center", Icons.Default.Security, badgeText = "SECURE"),
-                        DrawerItem(AppScreen.COMPONENTS, "Component Database", Icons.Default.Category, badgeText = "25+"),
-                        DrawerItem(AppScreen.COMPARATOR, "Comparator & Signals", Icons.Default.Tune),
-                        DrawerItem(AppScreen.TIMING, "Timings & Etho Clocks", Icons.Default.Timer),
-                        DrawerItem(AppScreen.SORTER, "Item Sorters & Storage", Icons.Default.Inventory2),
-                        DrawerItem(AppScreen.BALLISTICS, "Ballistics & TNT Cannons", Icons.Default.RocketLaunch),
-                        DrawerItem(AppScreen.LOGIC, "8-Bit Bus & Logic ALU", Icons.Default.Memory),
-                        DrawerItem(AppScreen.MECHANICS, "Bedrock Quirks & Rules", Icons.Default.MenuBook),
-                        DrawerItem(AppScreen.BLUEPRINTS, "Saved Presets", Icons.Default.Bookmark, badge = blueprints.size),
-                        DrawerItem(AppScreen.ABOUT, "About BERT & Community", Icons.Default.Info)
-                    )
+                    val drawerItems = buildList<DrawerItem> {
+                        add(DrawerItem(AppScreen.HOME, "Home Dashboard", Icons.Default.Home))
+                        add(DrawerItem(AppScreen.COMMUNITY, "Redstone Community", Icons.Default.Forum, badgeText = "Cloud"))
+                        add(DrawerItem(AppScreen.USER_PROFILE, "My Profile & Posts", Icons.Default.Person))
+                        if (isMasterAdmin) {
+                            add(DrawerItem(AppScreen.ADMIN, "Admin Control Center", Icons.Default.Security, badgeText = "ADMIN"))
+                        }
+                        add(DrawerItem(AppScreen.COMPONENTS, "Component Database", Icons.Default.Category, badgeText = "25+"))
+                        add(DrawerItem(AppScreen.COMPARATOR, "Comparator & Signals", Icons.Default.Tune))
+                        add(DrawerItem(AppScreen.TIMING, "Timings & Etho Clocks", Icons.Default.Timer))
+                        add(DrawerItem(AppScreen.SORTER, "Item Sorters & Storage", Icons.Default.Inventory2))
+                        add(DrawerItem(AppScreen.BALLISTICS, "Ballistics & TNT Cannons", Icons.Default.RocketLaunch))
+                        add(DrawerItem(AppScreen.LOGIC, "8-Bit Bus & Logic ALU", Icons.Default.Memory))
+                        add(DrawerItem(AppScreen.MECHANICS, "Bedrock Quirks & Rules", Icons.Default.MenuBook))
+                        add(DrawerItem(AppScreen.BLUEPRINTS, "Saved Presets", Icons.Default.Bookmark, badge = blueprints.size))
+                        add(DrawerItem(AppScreen.INFOGRAPHIC, "Infographic Lab", Icons.Default.Palette, badgeText = "RGBA"))
+                        add(DrawerItem(AppScreen.ABOUT, "About BERT & Community", Icons.Default.Info))
+                    }
 
                     drawerItems.forEach { item ->
                         val isSelected = currentScreen == item.screen
@@ -548,7 +555,8 @@ fun BERTApp(
                 if (currentScreen != AppScreen.COMMUNITY &&
                     currentScreen != AppScreen.CREATE_POST &&
                     currentScreen != AppScreen.USER_PROFILE &&
-                    currentScreen != AppScreen.ADMIN
+                    currentScreen != AppScreen.ADMIN &&
+                    currentScreen != AppScreen.INFOGRAPHIC
                 ) {
                     Surface(
                         onClick = { showToolsSheet = true },
@@ -700,6 +708,14 @@ fun BERTApp(
                                 onNavigateBack = { viewModel.navigateTo(AppScreen.USER_PROFILE) }
                             )
                         }
+                        AppScreen.INFOGRAPHIC -> {
+                            InfographicScreen(
+                                onNavigateBack = { viewModel.navigateTo(AppScreen.HOME) },
+                                onNavigateToCreatePost = { _ ->
+                                    viewModel.navigateTo(AppScreen.CREATE_POST)
+                                }
+                            )
+                        }
                         AppScreen.ABOUT -> {
                             AboutScreen()
                         }
@@ -769,84 +785,93 @@ fun BERTApp(
 
                 Spacer(modifier = Modifier.height(18.dp))
 
-                val toolsList = listOf(
-                    ToolOption(
+                val toolsList = buildList<ToolOption> {
+                    add(ToolOption(
                         screen = AppScreen.COMMUNITY,
                         title = "Community Creations",
                         subtitle = "Browse, post, like & comment on community Bedrock redstone contraptions",
                         icon = Icons.Default.Forum,
                         badge = "COMMUNITY"
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.USER_PROFILE,
                         title = "Creator Profile & My Posts",
                         subtitle = "Manage your published contraptions, stats and account",
                         icon = Icons.Default.Person
-                    ),
-                    ToolOption(
-                        screen = AppScreen.ADMIN,
-                        title = "Admin Control Center",
-                        subtitle = "Manage, ban, delete accounts & community creations",
-                        icon = Icons.Default.Security,
-                        badge = "ADMIN"
-                    ),
-                    ToolOption(
+                    ))
+                    if (isMasterAdmin) {
+                        add(ToolOption(
+                            screen = AppScreen.ADMIN,
+                            title = "Admin Control Center",
+                            subtitle = "Manage, ban, delete accounts & community creations",
+                            icon = Icons.Default.Security,
+                            badge = "ADMIN"
+                        ))
+                    }
+                    add(ToolOption(
                         screen = AppScreen.COMPONENTS,
                         title = "Component Database",
                         subtitle = "Every single MCBE redstone component with delays, quirks & Java differences",
                         icon = Icons.Default.Category,
                         badge = "NEW"
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.COMPARATOR,
                         title = "Comparator & Container Analyzer",
                         subtitle = "Exact container fullness calculations, target signal solver & subtraction simulator",
                         icon = Icons.Default.Tune
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.TIMING,
                         title = "Timings & Etho Clocks",
                         subtitle = "0.4s hopper transfer timing, repeater delay chain optimizer & pulse faders",
                         icon = Icons.Default.Timer
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.SORTER,
                         title = "Item Sorters & Storage",
                         subtitle = "ImpulseSV 41+1+1+1+1 filter calculations, safe crosstalk buffer & throughput",
                         icon = Icons.Default.Inventory2
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.BALLISTICS,
                         title = "Ballistics & TNT Cannons",
                         subtitle = "TNT cannon momentum vectors, payload fuse sync & trident killer DPS",
                         icon = Icons.Default.RocketLaunch
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.LOGIC,
                         title = "8-Bit Bus & Logic Gates",
                         subtitle = "Decimal/Hex/Binary/Analog conversion with live bit switches & logic gate library",
                         icon = Icons.Default.Memory
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.MECHANICS,
                         title = "Bedrock Quirks & Rules",
                         subtitle = "Searchable guide covering random update order, movable tile entities & no QC",
                         icon = Icons.Default.MenuBook
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.BLUEPRINTS,
                         title = "Saved Presets & Notes",
                         subtitle = "Manage ${blueprints.size} saved setups, favorite circuits & custom contraption notes",
                         icon = Icons.Default.Bookmark,
                         badge = if (blueprints.isNotEmpty()) "${blueprints.size}" else null
-                    ),
-                    ToolOption(
+                    ))
+                    add(ToolOption(
+                        screen = AppScreen.INFOGRAPHIC,
+                        title = "Infographic Lab & Compositor",
+                        subtitle = "Minimalist photo compositor with 32-bit RGBA transparency for Discord",
+                        icon = Icons.Default.Palette,
+                        badge = "RGBA"
+                    ))
+                    add(ToolOption(
                         screen = AppScreen.HOME,
                         title = "Home Dashboard",
                         subtitle = "Return to main home overview and featured contraptions",
                         icon = Icons.Default.Home
-                    )
-                )
+                    ))
+                }
 
                 toolsList.forEach { tool ->
                     Surface(

@@ -158,10 +158,6 @@ fun UserProfileScreen(
                     ) {
                         Text("Back to Community", color = White)
                     }
-                    Spacer(modifier = Modifier.height(10.dp))
-                    TextButton(onClick = onNavigateToAdmin) {
-                        Text("Admin Terminal Gateway", color = Color(0xFFF87171), fontSize = 12.sp)
-                    }
                 }
             }
         } else {
@@ -299,23 +295,25 @@ fun UserProfileScreen(
                                 Text("Edit Profile & Avatar", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                             }
 
-                            Spacer(modifier = Modifier.height(10.dp))
+                            if (user.email.equals("rrrightrat@gmail.com", ignoreCase = true)) {
+                                Spacer(modifier = Modifier.height(10.dp))
 
-                            OutlinedButton(
-                                onClick = onNavigateToAdmin,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("admin_panel_open_button"),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    containerColor = Color(0xFF220F15),
-                                    contentColor = Color(0xFFFCA5A5)
-                                ),
-                                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF991B1B))
-                            ) {
-                                Icon(Icons.Default.Security, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFEF4444))
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Admin Control Center", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFCA5A5))
+                                OutlinedButton(
+                                    onClick = onNavigateToAdmin,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .testTag("admin_panel_open_button"),
+                                    shape = RoundedCornerShape(12.dp),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        containerColor = Color(0xFF220F15),
+                                        contentColor = Color(0xFFFCA5A5)
+                                    ),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF991B1B))
+                                ) {
+                                    Icon(Icons.Default.Security, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFFEF4444))
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Admin Control Center", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFCA5A5))
+                                }
                             }
                         }
                     }

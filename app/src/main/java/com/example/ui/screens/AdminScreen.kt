@@ -118,9 +118,6 @@ fun AdminScreen(
     var userToDelete by remember { mutableStateOf<CommunityUser?>(null) }
     var postToDelete by remember { mutableStateOf<CommunityPost?>(null) }
 
-    // Passcode gate state
-    var enteredPin by remember { mutableStateOf("") }
-
     Scaffold(
         containerColor = DarkBackground,
         topBar = {
@@ -140,7 +137,7 @@ fun AdminScreen(
                         Column {
                             Text("Admin Operations", fontWeight = FontWeight.Bold, color = White, fontSize = 16.sp)
                             Text(
-                                text = if (isAdminAuth) "Clearance Level 5 • Master Admin" else "Security Gateway",
+                                text = if (isAdminAuth) "Master Admin • ${currentUser?.email}" else "Access Restricted",
                                 color = if (isAdminAuth) Color(0xFF4ADE80) else Color(0xFFF87171),
                                 fontSize = 11.sp
                             )
@@ -150,16 +147,6 @@ fun AdminScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack, modifier = Modifier.testTag("admin_back_button")) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = White)
-                    }
-                },
-                actions = {
-                    if (isAdminAuth) {
-                        IconButton(
-                            onClick = { viewModel.lockAdmin() },
-                            modifier = Modifier.testTag("admin_lock_session_button")
-                        ) {
-                            Icon(Icons.Default.Lock, contentDescription = "Lock Admin Session", tint = Color(0xFFF87171))
-                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = DarkSurface)
@@ -173,21 +160,14 @@ fun AdminScreen(
                 .background(DarkBackground)
         ) {
             if (!isAdminAuth) {
-                // Security Gateway Screen
-                AdminPasscodeGate(
-                    enteredPin = enteredPin,
-                    onPinChange = { enteredPin = it },
+                // Access Restricted Screen (Shown only if accessed without master account)
+                AdminAccessRestrictedGate(
                     userEmail = currentUser?.email.orEmpty(),
                     masterEmail = viewModel.masterAdminEmail,
-                    onUnlock = {
-                        val success = viewModel.authenticateAdmin(enteredPin)
-                        if (success) {
-                            enteredPin = ""
-                        }
-                    }
+                    onNavigateBack = onNavigateBack
                 )
             } else {
-                // Full Admin Dashboard
+                // Full Admin Dashboard - Instantly accessible when logged in as master Google account
                 Column(modifier = Modifier.fillMaxSize()) {
                     // Quick Stats Bar
                     AdminStatsHeader(
@@ -360,29 +340,21 @@ fun AdminScreen(
 }
 
 @Composable
-private fun AdminPasscodeGate(
-    enteredPin: String,
-    onPinChange: (String) -> Unit,
+private fun AdminAccessRestrictedGate(
     userEmail: String,
     masterEmail: String,
-    onUnlock: () -> Unit
+    onNavigateBack: () -> Unit
 ) {
-    var passwordVisible by remember { mutableStateOf(false) }
-    val isMasterEmail = userEmail.equals(masterEmail, ignoreCase = true)
-    val masterHexKey = "0x42455254"
-    val masterBinaryKey = "10101101"
-    val masterCombinedKey = "0x42455254_10101101"
-
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(20.dp),
+            .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
             color = DarkSurface,
             shape = RoundedCornerShape(24.dp),
-            border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF6B21A8)),
+            border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF7F1D1D)),
             shadowElevation = 16.dp,
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -390,249 +362,71 @@ private fun AdminPasscodeGate(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Cybernetic Security Shield
                 Box(
                     modifier = Modifier
-                        .size(68.dp)
+                        .size(64.dp)
                         .clip(CircleShape)
-                        .background(
-                            Brush.linearGradient(
-                                listOf(Color(0xFF2E0854), Color(0xFF1E1035))
-                            )
-                        )
-                        .border(2.dp, PurpleBright, CircleShape),
+                        .background(Color(0xFF2B1218))
+                        .border(2.dp, Color(0xFFEF4444), CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Security,
-                        contentDescription = "Security Gateway",
-                        tint = PurpleBright,
-                        modifier = Modifier.size(34.dp)
+                        imageVector = Icons.Default.Block,
+                        contentDescription = "Access Denied",
+                        tint = Color(0xFFF87171),
+                        modifier = Modifier.size(32.dp)
                     )
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                Text(
-                    text = "HEX & BINARY CLEARANCE",
-                    fontWeight = FontWeight.Black,
-                    fontSize = 17.sp,
-                    color = White,
-                    letterSpacing = 1.1.sp
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "Master clearance requires composite hexadecimal and binary cryptographic keys.",
-                    fontSize = 12.sp,
-                    color = GrayText,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    lineHeight = 16.sp
-                )
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Hex and Binary Key Blueprint Display
-                Surface(
-                    color = DarkBackground,
-                    shape = RoundedCornerShape(14.dp),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF3B1D60)),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(modifier = Modifier.padding(12.dp)) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Code, contentDescription = null, tint = FilterOrange, modifier = Modifier.size(15.dp))
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("CRYPTOGRAPHIC SPEC", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = FilterOrange)
-                            }
-                            Text("ENTROPY: 64-BIT", fontSize = 9.sp, color = MutedText, fontFamily = FontFamily.Monospace)
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            // Hex Key Pill
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFF1F1433))
-                                    .border(1.dp, PurpleBright.copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                                    .padding(horizontal = 8.dp, vertical = 6.dp)
-                            ) {
-                                Column {
-                                    Text("HEX (BERT)", fontSize = 9.sp, color = MutedText)
-                                    Text(
-                                        masterHexKey,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = PurpleBright,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-                                }
-                            }
-
-                            // Binary Key Pill
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(8.dp))
-                                    .background(Color(0xFF1F1433))
-                                    .border(1.dp, Color(0xFF10B981).copy(alpha = 0.5f), RoundedCornerShape(8.dp))
-                                    .padding(horizontal = 8.dp, vertical = 6.dp)
-                            ) {
-                                Column {
-                                    Text("BINARY (0xAD)", fontSize = 9.sp, color = MutedText)
-                                    Text(
-                                        masterBinaryKey,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF4ADE80),
-                                        fontFamily = FontFamily.Monospace
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Full Master Composite Key Quick-Insert
-                        Surface(
-                            onClick = { onPinChange(masterCombinedKey) },
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color(0xFF28113B),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, PurpleBright),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 10.dp, vertical = 7.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text("MASTER COMPOSITE KEY:", fontSize = 9.sp, color = GrayText)
-                                    Text(
-                                        masterCombinedKey,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = White,
-                                        fontFamily = FontFamily.Monospace
-                                    )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(PurplePrimary)
-                                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                                ) {
-                                    Text("AUTO-FILL", fontSize = 10.sp, fontWeight = FontWeight.Black, color = Color.Black)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (userEmail.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(if (isMasterEmail) Color(0xFF0F2E1E) else DarkSurfaceVariant)
-                            .border(1.dp, if (isMasterEmail) Color(0xFF22C55E) else DarkCardBorder, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 10.dp, vertical = 6.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Operator: $userEmail",
-                                fontSize = 11.sp,
-                                color = if (isMasterEmail) Color(0xFF4ADE80) else GrayText,
-                                fontWeight = FontWeight.Medium
-                            )
-                            if (isMasterEmail) {
-                                Text("BYPASS ACTIVE", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4ADE80))
-                            }
-                        }
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Passcode Text Input with Monospace font and Eye Toggle
-                OutlinedTextField(
-                    value = enteredPin,
-                    onValueChange = onPinChange,
-                    label = { Text("Hex & Binary Passcode") },
-                    placeholder = { Text("0x42455254_10101101", color = MutedText, fontFamily = FontFamily.Monospace) },
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    singleLine = true,
-                    textStyle = androidx.compose.ui.text.TextStyle(
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 14.sp
-                    ),
-                    leadingIcon = {
-                        Icon(Icons.Default.Key, contentDescription = null, tint = PurpleBright, modifier = Modifier.size(18.dp))
-                    },
-                    trailingIcon = {
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(
-                                imageVector = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                                contentDescription = if (passwordVisible) "Hide Passcode" else "Show Passcode",
-                                tint = GrayText,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PurpleBright,
-                        unfocusedBorderColor = DarkCardBorder,
-                        focusedTextColor = White,
-                        unfocusedTextColor = White
-                    ),
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .testTag("admin_passcode_input")
+                Text(
+                    text = "ACCESS RESTRICTED",
+                    fontWeight = FontWeight.Black,
+                    fontSize = 18.sp,
+                    color = White,
+                    letterSpacing = 1.1.sp
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "The Admin Control Center is exclusively authorized for the master Google account ($masterEmail).",
+                    fontSize = 13.sp,
+                    color = GrayText,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    lineHeight = 18.sp
+                )
+
+                if (userEmail.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(DarkSurfaceVariant)
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "Currently signed in as: $userEmail",
+                            fontSize = 11.sp,
+                            color = Color(0xFFFCA5A5),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
-                    onClick = onUnlock,
+                    onClick = onNavigateBack,
                     colors = ButtonDefaults.buttonColors(containerColor = PurplePrimary),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
-                        .testTag("admin_unlock_button")
                 ) {
-                    Icon(Icons.Default.Fingerprint, contentDescription = null, modifier = Modifier.size(18.dp), tint = Color.Black)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Verify & Unlock Terminal", fontWeight = FontWeight.Bold, color = Color.Black)
+                    Text("Return to App", fontWeight = FontWeight.Bold, color = White)
                 }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "Master Key Format: 0x<HEX>_<BINARY>",
-                    fontSize = 10.sp,
-                    color = MutedText,
-                    fontFamily = FontFamily.Monospace
-                )
             }
         }
     }
